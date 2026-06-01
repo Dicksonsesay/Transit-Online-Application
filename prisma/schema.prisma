@@ -1,0 +1,260 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum AdminRole {
+  super_admin
+  admin
+  admissions_officer
+}
+
+enum AdminStatus {
+  active
+  inactive
+  suspended
+}
+
+enum PinStatus {
+  unused
+  used
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum StudentAccountStatus {
+  active
+  inactive
+  pending
+  suspended
+}
+
+enum ProgrammeStatus {
+  active
+  inactive
+}
+
+enum ApplicationStatus {
+  submitted
+  under_review
+  interview_scheduled
+  interviewed
+  accepted
+  rejected
+}
+
+enum InterviewStatus {
+  scheduled
+  completed
+  missed
+  cancelled
+}
+
+enum NotificationType {
+  interview
+  acceptance
+  rejection
+  general
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model Admin {
+  id        Int         @id @default(autoincrement())
+  fullname  String      @db.VarChar(150)
+  email     String      @unique @db.VarChar(150)
+  phone     String?     @db.VarChar(20)
+  password  String      @db.VarChar(255)
+  role      AdminRole   @default(admin)
+  status    AdminStatus @default(active)
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  generatedPins        Pin[]              @relation("PinGeneratedBy")
+  scheduledInterviews  Interview[]        @relation("InterviewScheduledBy")
+  generatedLetters     AcceptanceLetter[] @relation("LetterGeneratedBy")
+  auditLogs            AuditLog[]
+
+  @@map("admins")
+}
+
+model Pin {
+  id             Int       @id @default(autoincrement())
+  pinCode        String    @unique @map("pin_code") @db.VarChar(50)
+  receiptNumber  String?   @map("receipt_number") @db.VarChar(100)
+  amount         Decimal   @db.Decimal(10, 2)
+  status         PinStatus @default(unused)
+  generatedById  Int       @map("generated_by")
+  usedByStudentId Int?     @unique @map("used_by_student")
+  usedAt         DateTime? @map("used_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  generatedBy   Admin    @relation("PinGeneratedBy", fields: [generatedById], references: [id])
+  usedByStudent Student? @relation("PinUsedByStudent", fields: [usedByStudentId], references: [id])
+  student       Student? @relation("StudentPin")
+
+  @@map("pins")
+}
+
+model Student {
+  id                Int                  @id @default(autoincrement())
+  applicationNumber String?              @unique @map("application_number") @db.VarChar(100)
+  fullname          String               @db.VarChar(150)
+  gender            Gender?
+  dateOfBirth       DateTime?            @map("date_of_birth") @db.Date
+  email             String               @unique @db.VarChar(150)
+  phone             String?              @db.VarChar(20)
+  password          String               @db.VarChar(255)
+  address           String?              @db.Text
+  nationality       String?              @db.VarChar(100)
+  passportPhoto     String?              @map("passport_photo") @db.VarChar(255)
+  pinId             Int?                 @unique @map("pin_id")
+  accountStatus     StudentAccountStatus @default(pending) @map("account_status")
+  createdAt         DateTime             @default(now()) @map("created_at")
+
+  pin               Pin?               @relation("StudentPin", fields: [pinId], references: [id])
+  usedPin           Pin?               @relation("PinUsedByStudent")
+  application          Application?
+  applicationFormDraft ApplicationFormDraft?
+  uploadedDocuments    UploadedDocument[]
+  interviews        Interview[]
+  notifications     Notification[]
+  acceptanceLetter  AcceptanceLetter?
+
+  @@map("students")
+}
+
+model Programme {
+  id            Int             @id @default(autoincrement())
+  programmeName String          @map("programme_name") @db.VarChar(200)
+  department    String          @db.VarChar(150)
+  duration      String          @db.VarChar(50)
+  status        ProgrammeStatus @default(active)
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  applications Application[]
+
+  @@map("programmes")
+}
+
+model Application {
+  id                Int               @id @default(autoincrement())
+  studentId         Int               @unique @map("student_id")
+  programmeId       Int               @map("programme_id")
+  previousSchool    String?           @map("previous_school") @db.VarChar(255)
+  waecIndexNumber   String?           @map("waec_index_number") @db.VarChar(100)
+  waecYear          String?           @map("waec_year") @db.VarChar(10)
+  aggregateScore    String?           @map("aggregate_score") @db.VarChar(20)
+  guardianName      String?           @map("guardian_name") @db.VarChar(150)
+  guardianPhone     String?           @map("guardian_phone") @db.VarChar(20)
+  guardianAddress   String?           @map("guardian_address") @db.Text
+  formPayload       Json?             @map("form_payload")
+  applicationStatus ApplicationStatus @default(submitted) @map("application_status")
+  submittedAt       DateTime          @default(now()) @map("submitted_at")
+
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  programme Programme @relation(fields: [programmeId], references: [id])
+
+  @@map("applications")
+}
+
+model ApplicationFormDraft {
+  id             Int       @id @default(autoincrement())
+  studentId      Int       @unique @map("student_id")
+  currentSection Int       @default(1) @map("current_section")
+  formData       Json      @default("{}") @map("form_data")
+  submittedAt    DateTime? @map("submitted_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("application_form_drafts")
+}
+
+model Interview {
+  id              Int             @id @default(autoincrement())
+  studentId       Int             @map("student_id")
+  scheduledById   Int             @map("scheduled_by")
+  interviewDate   DateTime        @map("interview_date") @db.Date
+  interviewTime   DateTime        @map("interview_time") @db.Time(0)
+  venue           String?         @db.VarChar(255)
+  meetingLink     String?         @map("meeting_link") @db.VarChar(255)
+  interviewStatus InterviewStatus @default(scheduled) @map("interview_status")
+  remarks         String?         @db.Text
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  student     Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  scheduledBy Admin   @relation("InterviewScheduledBy", fields: [scheduledById], references: [id])
+
+  @@map("interviews")
+}
+
+model UploadedDocument {
+  id           Int      @id @default(autoincrement())
+  studentId    Int      @map("student_id")
+  documentType String   @map("document_type") @db.VarChar(100)
+  filePath     String   @map("file_path") @db.VarChar(255)
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("uploaded_documents")
+}
+
+model Notification {
+  id               Int              @id @default(autoincrement())
+  studentId        Int              @map("student_id")
+  title            String           @db.VarChar(255)
+  message          String           @db.Text
+  notificationType NotificationType @map("notification_type")
+  isRead           Boolean          @default(false) @map("is_read")
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model AcceptanceLetter {
+  id              Int      @id @default(autoincrement())
+  studentId       Int      @unique @map("student_id")
+  letterReference String   @map("letter_reference") @db.VarChar(100)
+  pdfPath         String   @map("pdf_path") @db.VarChar(255)
+  generatedById   Int      @map("generated_by")
+  generatedAt     DateTime @default(now()) @map("generated_at")
+
+  student     Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  generatedBy Admin   @relation("LetterGeneratedBy", fields: [generatedById], references: [id])
+
+  @@map("acceptance_letters")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  adminId   Int      @map("admin_id")
+  action    String   @db.Text
+  ipAddress String?  @map("ip_address") @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+model SystemSetting {
+  key       String   @id @db.VarChar(100)
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
