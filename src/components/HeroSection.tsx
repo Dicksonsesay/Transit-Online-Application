@@ -26,6 +26,11 @@ const YELLOW_PATH =
 const PHOTO_CLIP_PATH =
   "M 0.56 0 C 0.52 0.1, 0.6 0.28, 0.59 0.5 C 0.58 0.72, 0.5 0.88, 0.2 1 L 1 1 L 1 0 Z";
 
+const CAMPUS_IMAGE = {
+  src: "/images/campus.png",
+  alt: "Transit College campus building",
+} as const;
+
 function HeroCurvedBackground() {
   return (
     <svg
@@ -45,6 +50,25 @@ function HeroCurvedBackground() {
   );
 }
 
+function HeroCampusImageMobile() {
+  return (
+    <div className="relative mt-4 aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/20 shadow-lg shadow-black/25 sm:mt-5 sm:aspect-[5/3] lg:hidden">
+      <Image
+        src={CAMPUS_IMAGE.src}
+        alt={CAMPUS_IMAGE.alt}
+        fill
+        className="object-cover object-center"
+        sizes="(max-width: 1024px) 100vw, 0px"
+        priority
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--hero-blue)]/30 via-transparent to-transparent"
+        aria-hidden
+      />
+    </div>
+  );
+}
+
 export default function HeroSection() {
   return (
     <section className="relative min-h-[min(52vh,520px)] overflow-hidden bg-[var(--hero-blue)] lg:min-h-[min(62vh,580px)]">
@@ -55,8 +79,8 @@ export default function HeroSection() {
         style={{ clipPath: "url(#hero-photo-clip)" }}
       >
         <Image
-          src="/images/campus.png"
-          alt="Transit College campus building"
+          src={CAMPUS_IMAGE.src}
+          alt={CAMPUS_IMAGE.alt}
           fill
           className="object-cover object-center"
           sizes="55vw"
@@ -87,17 +111,19 @@ export default function HeroSection() {
             bank, get your PIN and start your application today.
           </p>
 
-          <div className="mt-5 flex w-full max-w-xl items-center justify-between gap-3">
+          <HeroCampusImageMobile />
+
+          <div className="mt-5 flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Link
               href="/auth/verify-pin"
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--primary-yellow)] py-2.5 pl-5 pr-2.5 text-sm font-semibold text-[var(--dark-blue)] transition-opacity hover:opacity-90 sm:gap-3 sm:py-3 sm:pl-6 sm:pr-3 sm:text-base"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--primary-yellow)] py-2.5 pl-5 pr-2.5 text-sm font-semibold text-[var(--dark-blue)] transition-opacity hover:opacity-90 sm:gap-3 sm:py-3 sm:pl-6 sm:pr-3 sm:text-base"
             >
               Start Application
               <ArrowIcon />
             </Link>
             <Link
               href="/student"
-              className="inline-flex items-center rounded-full border-2 border-white px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:px-7 sm:py-3 sm:text-base"
+              className="inline-flex items-center justify-center rounded-full border-2 border-white px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:px-7 sm:py-3 sm:text-base"
             >
               Check Application
             </Link>
