@@ -26,9 +26,9 @@ const YELLOW_PATH =
 const PHOTO_CLIP_PATH =
   "M 0.56 0 C 0.52 0.1, 0.6 0.28, 0.59 0.5 C 0.58 0.72, 0.5 0.88, 0.2 1 L 1 1 L 1 0 Z";
 
-const CAMPUS_IMAGE = {
-  src: "/images/campus.png",
-  alt: "Transit College campus building",
+const HERO_IMAGE = {
+  src: "/images/transit-students.png",
+  alt: "Transit College students in uniform standing in front of the college logo",
 } as const;
 
 function HeroCurvedBackground() {
@@ -54,8 +54,8 @@ function HeroCampusImageMobile() {
   return (
     <div className="relative mt-4 aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/20 shadow-lg shadow-black/25 sm:mt-5 sm:aspect-[5/3] lg:hidden">
       <Image
-        src={CAMPUS_IMAGE.src}
-        alt={CAMPUS_IMAGE.alt}
+        src={HERO_IMAGE.src}
+        alt={HERO_IMAGE.alt}
         fill
         className="object-cover object-center"
         sizes="(max-width: 1024px) 100vw, 0px"
@@ -79,8 +79,8 @@ export default function HeroSection() {
         style={{ clipPath: "url(#hero-photo-clip)" }}
       >
         <Image
-          src={CAMPUS_IMAGE.src}
-          alt={CAMPUS_IMAGE.alt}
+          src={HERO_IMAGE.src}
+          alt={HERO_IMAGE.alt}
           fill
           className="object-cover object-center"
           sizes="55vw"
