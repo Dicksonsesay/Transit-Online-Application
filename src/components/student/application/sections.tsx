@@ -431,7 +431,7 @@ export function EnrolmentSection({
     <div className="space-y-5">
       <SectionTitle>Enrolment Information</SectionTitle>
 
-      <Field label="Program" required>
+      <Field label="Programme" required>
         <select
           value={selectedLevel}
           onChange={(e) => {

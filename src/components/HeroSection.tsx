@@ -107,7 +107,7 @@ export default function HeroSection() {
           </p>
 
           <p className="mt-3 max-w-md text-sm leading-relaxed text-white/95 sm:text-base">
-            Apply online for admission into our various programs. Pay at the
+            Apply online for admission into our various programmes. Pay at the
             bank, get your PIN and start your application today.
           </p>
 

@@ -36,8 +36,8 @@ export default function RequirementsView() {
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/90 sm:text-lg">
             Review the academic qualifications, documents, and eligibility criteria for
-            degree programmes affiliated with Njala University and TEVET/NCTVA pathways
-            at Transit College Sierra Leone before you apply.
+            degree programmes affiliated with Njala University and TEVET/NCTVA-accredited
+            pathways at Transit College Sierra Leone before you apply.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -114,7 +114,7 @@ export default function RequirementsView() {
             </h2>
             <p className="mx-auto mt-2 max-w-2xl text-zinc-600">
               Select the level that matches your intended course of study. Diploma
-              pathways are available in the same subject areas as affiliated degree
+              pathways are available in the same subject areas as Njala University degree
               programmes.
             </p>
           </div>

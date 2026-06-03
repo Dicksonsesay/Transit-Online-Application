@@ -6,10 +6,12 @@ import {
   FiCalendar,
   FiCheckCircle,
   FiClock,
+  FiTrash2,
   FiUsers,
   FiXCircle,
 } from "react-icons/fi";
 import {
+  deleteScheduledInterviewAction,
   scheduleInterviewAction,
   updateInterviewStatusAction,
 } from "@/actions/admin-interviews";
@@ -36,7 +38,7 @@ import {
   toCalendarDateString,
 } from "@/lib/calendar-date";
 import { cn } from "@/lib/utils";
-import { showError, showSuccess } from "@/lib/alerts";
+import { confirmDelete, showError, showSuccess } from "@/lib/alerts";
 
 type InterviewManagementProps = {
   interviews: InterviewListItem[];
@@ -56,6 +58,7 @@ export default function InterviewManagement({
   const [showForm, setShowForm] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [pendingStatus, startStatus] = useTransition();
+  const [pendingDelete, startDelete] = useTransition();
 
   const [scheduleState, scheduleAction, scheduling] = useActionState(
     scheduleInterviewAction,
@@ -92,6 +95,29 @@ export default function InterviewManagement({
         return;
       }
       await showSuccess("Updated", `Interview marked as ${interviewStatusLabel[status]}.`);
+      router.refresh();
+    });
+  }
+
+  function handleDelete(item: InterviewListItem) {
+    startDelete(async () => {
+      const result = await confirmDelete(
+        `the scheduled interview for ${item.studentName}`,
+        {
+          text: "This removes the interview record so you can reschedule if needed. Completed interview records cannot be deleted.",
+        }
+      );
+      if (!result.isConfirmed) return;
+
+      const response = await deleteScheduledInterviewAction(item.id);
+      if (response.error) {
+        await showError("Cannot delete", response.error);
+        return;
+      }
+      await showSuccess(
+        "Interview removed",
+        `${item.studentName}'s scheduled interview has been deleted.`
+      );
       router.refresh();
     });
   }
@@ -363,21 +389,33 @@ export default function InterviewManagement({
                   </AdminTd>
                   <AdminTd className="text-right">
                     {item.interviewStatus === "scheduled" ? (
-                      <select
-                        disabled={pendingStatus}
-                        defaultValue=""
-                        onChange={(e) => {
-                          const value = e.target.value as InterviewStatus;
-                          if (value) handleStatusChange(item.id, value);
-                          e.target.value = "";
-                        }}
-                        className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
-                      >
-                        <option value="">Update status…</option>
-                        <option value="completed">Completed</option>
-                        <option value="missed">Missed</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
+                      <div className="flex items-center justify-end gap-1">
+                        <select
+                          disabled={pendingStatus || pendingDelete}
+                          defaultValue=""
+                          onChange={(e) => {
+                            const value = e.target.value as InterviewStatus;
+                            if (value) handleStatusChange(item.id, value);
+                            e.target.value = "";
+                          }}
+                          className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15 disabled:opacity-50"
+                        >
+                          <option value="">Update status…</option>
+                          <option value="completed">Completed</option>
+                          <option value="missed">Missed</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item)}
+                          disabled={pendingDelete || pendingStatus}
+                          className="rounded-xl p-2.5 text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+                          title="Remove scheduled interview"
+                          aria-label={`Remove interview for ${item.studentName}`}
+                        >
+                          <FiTrash2 size={16} aria-hidden />
+                        </button>
+                      </div>
                     ) : (
                       <span className="text-xs text-zinc-400">No actions</span>
                     )}

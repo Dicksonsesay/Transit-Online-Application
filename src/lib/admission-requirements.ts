@@ -72,7 +72,7 @@ export const PROGRAMME_LEVEL_REQUIREMENTS: ProgrammeLevelRequirement[] = [
     level: "Diploma",
     affiliation: "TEVET/NCTVA",
     summary:
-      "Diploma programmes are available in the same fields as affiliated degree areas—for example, Diploma in Agriculture General alongside the BSc in Agriculture General.",
+      "Diploma programmes are available in the same fields as Njala University degree areas—for example, Diploma in Agriculture General alongside the BSc in Agriculture General.",
     requirements: [
       "WASSCE or GBCE with at least five passes, including English Language.",
       "Credit or pass grades in subjects relevant to the chosen diploma programme.",

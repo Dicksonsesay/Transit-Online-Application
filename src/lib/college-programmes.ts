@@ -48,8 +48,8 @@ export const PROGRAMME_LEVEL_LABELS: Record<ProgrammeLevel, string> = {
 export const NJALA_AFFILIATION_INTRO =
   "The University Administration received recommendations from the Affiliation Committee to allow Transit College – SL to affiliate the following degree programmes with Njala University.";
 
-export const TEVET_AFFILIATION_INTRO =
-  "Transit College – SL is also affiliated with TEVET/NCTVA to offer Higher National Diplomas, Diplomas, Higher Teacher Certificates (Primary and Secondary), Teacher Certificates, and other certificate programmes. For each affiliated degree area, equivalent diploma pathways are available (for example, Diploma in Agriculture General alongside the BSc in Agriculture General).";
+export const TEVET_ACCREDITATION_INTRO =
+  "Transit College – SL is accredited with TEVET/NCTVA to offer Higher National Diplomas, Diplomas, Higher Teacher Certificates (Primary and Secondary), Teacher Certificates, and other certificate programmes. For each related degree area, equivalent diploma pathways are available (for example, Diploma in Agriculture General alongside the BSc in Agriculture General).";
 
 export const PROGRAMME_CATEGORIES: ProgrammeCategory[] = [
   {

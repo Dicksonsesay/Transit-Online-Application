@@ -5,7 +5,7 @@ import ProgramsView from "@/components/public/ProgramsView";
 export const metadata = {
   title: "Programmes | Transit College",
   description:
-    "Degree programmes affiliated with Njala University and TEVET/NCTVA pathways—diplomas, HND, teacher certificates, and certificates—offered at Transit College Sierra Leone.",
+    "Degree programmes affiliated with Njala University and TEVET/NCTVA-accredited pathways—diplomas, HND, teacher certificates, and certificates—offered at Transit College Sierra Leone.",
 };
 
 export default function ProgramsPage() {

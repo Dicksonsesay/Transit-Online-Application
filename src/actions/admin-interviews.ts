@@ -194,3 +194,54 @@ export async function updateInterviewStatusAction(
   revalidateInterviewPaths(interview.studentId);
   return { success: true };
 }
+
+export async function deleteScheduledInterviewAction(
+  interviewId: number
+): Promise<{ error?: string; success?: boolean }> {
+  const session = await requireAdminSession();
+  if (!session) return { error: "You must be signed in as an admin." };
+
+  if (!Number.isInteger(interviewId) || interviewId < 1) {
+    return { error: "Invalid interview." };
+  }
+
+  const interview = await prisma.interview.findUnique({
+    where: { id: interviewId },
+    include: {
+      student: {
+        select: {
+          id: true,
+          application: { select: { applicationStatus: true } },
+        },
+      },
+    },
+  });
+
+  if (!interview) return { error: "Interview not found." };
+
+  if (interview.interviewStatus !== "scheduled") {
+    return {
+      error: "Only scheduled interviews can be removed. Use status updates for completed records.",
+    };
+  }
+
+  await prisma.interview.delete({ where: { id: interviewId } });
+
+  if (interview.student.application?.applicationStatus === "interview_scheduled") {
+    await prisma.application.update({
+      where: { studentId: interview.studentId },
+      data: { applicationStatus: "under_review" },
+    });
+  }
+
+  await createStudentNotification({
+    studentId: interview.studentId,
+    notificationType: "interview",
+    title: "Interview removed",
+    message:
+      "Your scheduled interview has been removed by admissions. Please check your messages or contact the admissions office for next steps.",
+  });
+
+  revalidateInterviewPaths(interview.studentId);
+  return { success: true };
+}

@@ -13,7 +13,7 @@ import {
   NJALA_AFFILIATION_INTRO,
   PROGRAMME_CATEGORIES,
   PROGRAMME_LEVEL_LABELS,
-  TEVET_AFFILIATION_INTRO,
+  TEVET_ACCREDITATION_INTRO,
   type CollegeProgramme,
 } from "@/lib/college-programmes";
 import { cn } from "@/lib/utils";
@@ -78,8 +78,8 @@ export default function ProgramsView() {
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/90 sm:text-lg">
             Transit College Sierra Leone offers degree programmes affiliated with Njala
             University, and Higher National Diplomas, Diplomas, Teacher Certificates,
-            Higher Teacher Certificates, and other certificate programmes through
-            TEVET/NCTVA affiliation.
+            Higher Teacher Certificates, and other certificate programmes accredited
+            with TEVET/NCTVA.
           </p>
           <p className="mt-3 text-sm font-medium text-[var(--primary-yellow)]">
             {njalaCount} degree programmes and {tevetCount} TEVET/NCTVA pathways across{" "}
@@ -110,10 +110,10 @@ export default function ProgramsView() {
             </span>
             <div>
               <h2 className="text-lg font-bold text-emerald-800">
-                Affiliated with TEVET/NCTVA
+                Accredited with TEVET/NCTVA
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-zinc-600">
-                {TEVET_AFFILIATION_INTRO}
+                {TEVET_ACCREDITATION_INTRO}
               </p>
             </div>
           </div>
@@ -219,8 +219,8 @@ export default function ProgramsView() {
             </h2>
             <p className="mt-2 text-sm text-zinc-600">
               Higher National Diplomas, Diplomas, Higher Teacher Certificates (Primary
-              &amp; Secondary), Teacher Certificates, and certificate programmes offered
-              through TEVET/NCTVA affiliation.
+              &amp; Secondary), Teacher Certificates, and certificate programmes
+              accredited with TEVET/NCTVA.
             </p>
             <ol className="mt-6 space-y-3">
               {ALL_TEVET_PROGRAMMES.map((programme, index) => (
@@ -246,8 +246,8 @@ export default function ProgramsView() {
         </div>
 
         <p className="mx-auto mt-6 max-w-[1400px] text-center text-sm text-zinc-500">
-          {ALL_COLLEGE_PROGRAMMES.length} total programme pathways listed across both
-          affiliations.
+          {ALL_COLLEGE_PROGRAMMES.length} total programme pathways listed across Njala
+          University affiliation and TEVET/NCTVA accreditation.
         </p>
       </section>
 
