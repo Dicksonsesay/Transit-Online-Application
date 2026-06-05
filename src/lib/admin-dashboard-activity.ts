@@ -66,7 +66,7 @@ export async function getAdminRecentActivities(
     })),
     ...letters.map((item) => ({
       id: `letter-${item.id}`,
-      title: `Acceptance letter generated for ${item.student.fullname}.`,
+      title: `Offer of admission generated for ${item.student.fullname}.`,
       timestamp: item.generatedAt.toISOString(),
       href: `/admin/applicants/${item.student.id}`,
       type: "letter" as const,

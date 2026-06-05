@@ -17,40 +17,12 @@ function ArrowIcon() {
   );
 }
 
-const BLUE_PATH =
-  "M 0 0 V 100 H 10 C 36 88, 46 72, 48 50 C 46 28, 36 10, 42 0 H 0 Z";
-
-const YELLOW_PATH =
-  "M 10 100 C 36 88, 46 72, 48 50 C 46 28, 36 10, 42 0 L 56 0 C 52 10, 60 28, 59 50 C 58 72, 50 88, 20 100 Z";
-
-const PHOTO_CLIP_PATH =
-  "M 0.56 0 C 0.52 0.1, 0.6 0.28, 0.59 0.5 C 0.58 0.72, 0.5 0.88, 0.2 1 L 1 1 L 1 0 Z";
-
 const HERO_IMAGE = {
   src: "/images/transit-students.png",
   alt: "Transit College students in uniform standing in front of the college logo",
 } as const;
 
-function HeroCurvedBackground() {
-  return (
-    <svg
-      className="pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      aria-hidden
-    >
-      <defs>
-        <clipPath id="hero-photo-clip" clipPathUnits="objectBoundingBox">
-          <path d={PHOTO_CLIP_PATH} />
-        </clipPath>
-      </defs>
-      <path fill="var(--hero-blue)" d={BLUE_PATH} />
-      <path fill="#f4b400" d={YELLOW_PATH} />
-    </svg>
-  );
-}
-
-function HeroCampusImageMobile() {
+function HeroPhotoMobile() {
   return (
     <div className="relative mt-4 aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/20 shadow-lg shadow-black/25 sm:mt-5 sm:aspect-[5/3] lg:hidden">
       <Image
@@ -69,27 +41,38 @@ function HeroCampusImageMobile() {
   );
 }
 
-export default function HeroSection() {
+/** Full-height photo panel on the right (desktop). */
+function HeroPhotoDesktop() {
   return (
-    <section className="relative min-h-[min(52vh,520px)] overflow-hidden bg-[var(--hero-blue)] lg:min-h-[min(62vh,580px)]">
-      <HeroCurvedBackground />
-
-      <div
-        className="absolute inset-0 z-[1] hidden lg:block"
-        style={{ clipPath: "url(#hero-photo-clip)" }}
-      >
+    <div className="relative hidden min-h-[280px] overflow-hidden bg-[#e8a317] lg:block lg:min-h-full">
+      <div className="absolute inset-y-0 inset-x-2 sm:inset-x-3 lg:inset-x-4">
         <Image
           src={HERO_IMAGE.src}
           alt={HERO_IMAGE.alt}
           fill
-          className="object-cover object-center"
-          sizes="55vw"
+          className="object-contain object-center"
+          sizes="(min-width: 1024px) 56vw, 0px"
           priority
         />
       </div>
+      {/* Thin edge fade only — does not cover the students */}
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-6 bg-gradient-to-r from-[var(--hero-blue)]/90 to-transparent lg:w-8"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-4 bg-gradient-to-l from-[#c9890f]/80 to-transparent lg:w-6"
+        aria-hidden
+      />
+    </div>
+  );
+}
 
-      <div className="relative z-20 flex h-full flex-col lg:flex-row">
-        <div className="flex h-full w-full flex-col justify-center px-5 py-6 sm:px-8 lg:w-[48%] lg:max-w-[48%] lg:shrink-0 lg:px-10 lg:py-8 xl:pl-14 xl:pr-8">
+export default function HeroSection() {
+  return (
+    <section className="relative min-h-[min(52vh,520px)] overflow-hidden bg-[var(--hero-blue)] lg:min-h-[min(68vh,620px)]">
+      <div className="relative z-10 grid min-h-[inherit] lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
+        <div className="relative z-20 flex flex-col justify-center px-5 py-6 sm:px-8 lg:px-10 lg:py-10 xl:pl-14 xl:pr-8">
           <p className="text-base font-medium tracking-wide text-white sm:text-lg">
             WELCOME TO
           </p>
@@ -111,9 +94,9 @@ export default function HeroSection() {
             bank, get your PIN and start your application today.
           </p>
 
-          <HeroCampusImageMobile />
+          <HeroPhotoMobile />
 
-          <div className="mt-5 flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative z-20 mt-5 flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <Link
               href="/auth/verify-pin"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--primary-yellow)] py-2.5 pl-5 pr-2.5 text-sm font-semibold text-[var(--dark-blue)] transition-opacity hover:opacity-90 sm:gap-3 sm:py-3 sm:pl-6 sm:pr-3 sm:text-base"
@@ -123,14 +106,14 @@ export default function HeroSection() {
             </Link>
             <Link
               href="/student"
-              className="inline-flex items-center justify-center rounded-full border-2 border-white px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:px-7 sm:py-3 sm:text-base"
+              className="inline-flex shrink-0 items-center justify-center rounded-full border-2 border-white px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:px-7 sm:py-3 sm:text-base"
             >
               Check Application
             </Link>
           </div>
         </div>
 
-        <div className="relative hidden min-h-0 flex-1 lg:block" aria-hidden />
+        <HeroPhotoDesktop />
       </div>
     </section>
   );

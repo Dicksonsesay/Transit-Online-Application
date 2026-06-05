@@ -15,7 +15,7 @@ function notificationTypeLabel(type: NotificationType): string {
     case "interview":
       return "Interview update";
     case "acceptance":
-      return "Admission acceptance";
+      return "Offer of admission";
     case "rejection":
       return "Application decision";
     case "general":

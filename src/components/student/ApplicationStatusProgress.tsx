@@ -22,7 +22,7 @@ export default function ApplicationStatusProgress({
       </h2>
       <p className="mt-1 text-sm text-zinc-500">
         Track your application from submission through interview, acceptance, and
-        your official acceptance letter.
+        your official offer of admission.
       </p>
 
       <ol className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-2">

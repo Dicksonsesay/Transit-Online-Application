@@ -67,7 +67,7 @@ export default function AcceptanceLetterManagement({
     {
       label: "Accepted applicants",
       value: applicants.length,
-      helper: "Eligible for letters",
+      helper: "Eligible for offers",
       icon: FiUsers,
       cardClass: "border-blue-200 bg-gradient-to-br from-blue-50 via-white to-cyan-50",
       iconClass: "bg-blue-600 text-white",
@@ -76,7 +76,7 @@ export default function AcceptanceLetterManagement({
     {
       label: "Generated",
       value: generatedCount,
-      helper: "Letters prepared",
+      helper: "Offers prepared",
       icon: FiCheckCircle,
       cardClass: "border-blue-200 bg-gradient-to-br from-blue-50 via-white to-cyan-50",
       iconClass: "bg-blue-600 text-white",
@@ -119,10 +119,10 @@ export default function AcceptanceLetterManagement({
         return;
       }
       await showSuccess(
-        "Letter generated",
+        "Offer generated",
         result.letterReference
           ? `Reference: ${result.letterReference}`
-          : "Acceptance letter generated successfully."
+          : "Offer of admission generated successfully."
       );
       router.refresh();
     });
@@ -136,8 +136,8 @@ export default function AcceptanceLetterManagement({
         return;
       }
       await showSuccess(
-        "Letter sent",
-        "The student has been notified by email and can download the letter in their portal."
+        "Offer sent",
+        "The student has been notified by email and can download the offer in their portal."
       );
       router.refresh();
     });
@@ -147,8 +147,8 @@ export default function AcceptanceLetterManagement({
     <div className="space-y-6">
       <AdminPageIntro
         icon={FiAward}
-        title="Acceptance letter desk"
-        description="Generate official acceptance letters for admitted students and notify them by email and portal message."
+        title="Offer of admission desk"
+        description="Generate official offers of admission for admitted students and notify them by email and portal message."
         accentClass="from-[var(--dark-blue)] via-[var(--hero-blue)] to-[var(--primary-blue)]"
       />
 
@@ -167,7 +167,7 @@ export default function AcceptanceLetterManagement({
 
       <AdminTableShell
         title="Accepted applicants"
-        subtitle="Generate PDF letters and publish to student portals"
+        subtitle="Generate PDF offers and publish to student portals"
         countLabel={`${filtered.length} record${filtered.length === 1 ? "" : "s"}`}
       >
         <AdminTable>
@@ -176,7 +176,7 @@ export default function AcceptanceLetterManagement({
             <AdminTh>Programme</AdminTh>
             <AdminTh>Course</AdminTh>
             <AdminTh>Year</AdminTh>
-            <AdminTh>Letter status</AdminTh>
+            <AdminTh>Offer status</AdminTh>
             <AdminTh className="text-right">Actions</AdminTh>
           </AdminTableHead>
           <AdminTableBody>
@@ -187,7 +187,7 @@ export default function AcceptanceLetterManagement({
                 title={applicants.length === 0 ? "No accepted applicants" : "No matches"}
                 description={
                   applicants.length === 0
-                    ? "Accept applicants from the Applicants page to generate letters here."
+                    ? "Accept applicants from the Applicants page to generate offers here."
                     : "Try a different search term."
                 }
               />

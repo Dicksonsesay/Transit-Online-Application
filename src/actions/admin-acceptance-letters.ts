@@ -84,9 +84,9 @@ export async function sendAcceptanceLetterAction(studentId: number) {
   await createStudentNotification({
     studentId,
     notificationType: "acceptance",
-    title: "Acceptance Letter Available",
+    title: "Offer of Admission Available",
     message:
-      "Congratulations! Your acceptance letter has been published. Open your student portal to view or download it. A copy of this notice has been sent to your registered email.",
+      "Congratulations! Your offer of admission has been published. Open your student portal to view or download it. A copy of this notice has been sent to your registered email.",
   });
 
   revalidatePath("/admin/acceptance-letters");

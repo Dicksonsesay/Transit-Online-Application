@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
         portalLabel="Admissions Control Center"
         dashboardTitle="Admin Dashboard"
         userName={adminName}
-        description="Centralize applicant review, interviews, acceptance letters, notifications, and reporting from one professional workspace."
+        description="Centralize applicant review, interviews, offers of admission, notifications, and reporting from one professional workspace."
       />
 
       <AdminDashboardOverview

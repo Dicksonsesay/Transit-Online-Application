@@ -20,7 +20,7 @@ const navIcons: Record<string, IconType> = {
   Dashboard: FiGrid,
   "My Application": FiFileText,
   Interview: FiCalendar,
-  "Acceptance Letter": FiAward,
+  "Offer of Admission": FiAward,
   "Change Password": FiLock,
 };
 

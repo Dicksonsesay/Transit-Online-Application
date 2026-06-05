@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { renderToBuffer } from "@react-pdf/renderer";
-import AcceptanceLetterPDFDocument from "@/components/acceptance/AcceptanceLetterPDFDocument";
 import { getAcceptanceLetterCandidateByStudentId } from "@/lib/admin-acceptance-letters";
+import { buildOfferOfAdmissionInput } from "@/lib/offer-of-admission/build-input";
+import { generateOfferOfAdmissionPdf } from "@/lib/offer-of-admission/generate-pdf";
 import { requireAdminSession } from "@/lib/session";
 
 export async function GET(
@@ -21,28 +21,28 @@ export async function GET(
 
   const applicant = await getAcceptanceLetterCandidateByStudentId(studentId);
   if (!applicant?.letter) {
-    return NextResponse.json({ error: "Acceptance letter not found." }, { status: 404 });
+    return NextResponse.json({ error: "Offer of admission not found." }, { status: 404 });
   }
 
   const url = new URL(request.url);
   const download = url.searchParams.get("download") === "1";
-  const pdfBuffer = await renderToBuffer(
-    <AcceptanceLetterPDFDocument
-      letterReference={applicant.letter.letterReference}
-      date={applicant.letter.generatedAt}
-      studentName={applicant.studentName}
-      programmeName={applicant.programmeName}
-      courseName={applicant.courseName ?? applicant.programmeName}
-      admissionYear={applicant.admissionYear}
-    />
+
+  const pdfBytes = await generateOfferOfAdmissionPdf(
+    buildOfferOfAdmissionInput({
+      studentName: applicant.studentName,
+      programmeName: applicant.programmeName,
+      courseName: applicant.courseName,
+      admissionYear: applicant.admissionYear,
+      generatedAt: applicant.letter.generatedAt,
+      programmeLevels: applicant.programmeLevels,
+    })
   );
 
-  const pdfBytes = new Uint8Array(pdfBuffer);
-  const fileName = `Acceptance-Letter-${
+  const fileName = `Offer-of-Admission-${
     applicant.applicationNumber ?? `student-${studentId}`
   }.pdf`;
 
-  return new NextResponse(pdfBytes, {
+  return new NextResponse(Buffer.from(pdfBytes), {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `${download ? "attachment" : "inline"}; filename="${fileName}"`,

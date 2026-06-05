@@ -22,10 +22,10 @@ export default async function AcceptanceLetterPage() {
     return (
       <div className="mx-auto max-w-3xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
         <StudentPageHero
-          badge="Acceptance letter"
+          badge="Offer of admission"
           icon={FiFileText}
           title="No application found"
-          description="Submit your admission application first. Your acceptance letter will be available here after you are admitted."
+          description="Submit your admission application first. Your offer of admission will be available here after you are admitted."
         />
         <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white px-6 py-10 text-center shadow-sm ring-1 ring-slate-900/5 sm:px-10">
           <Link

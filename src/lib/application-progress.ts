@@ -18,7 +18,7 @@ export const ADMISSION_PROGRESS_STEPS: AdmissionProgressStep[] = [
   { id: "under_review", label: "Under Review", index: 1 },
   { id: "interview", label: "Interview", index: 2 },
   { id: "accepted", label: "Accepted", index: 3 },
-  { id: "acceptance_letter", label: "Acceptance Letter", index: 4 },
+  { id: "acceptance_letter", label: "Offer of Admission", index: 4 },
 ];
 
 export type AdmissionProgressStepState = "complete" | "current" | "upcoming";

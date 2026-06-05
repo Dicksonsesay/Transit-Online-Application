@@ -7,7 +7,7 @@ export default async function AcceptanceLettersPage() {
   return (
     <div>
       <p className="mb-6 text-zinc-600">
-        Generate acceptance letters for admitted applicants and notify students once
+        Generate offers of admission for admitted applicants and notify students once
         published.
       </p>
       <AcceptanceLetterManagement applicants={applicants} />

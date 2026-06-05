@@ -26,7 +26,7 @@ type StudentMessagesViewProps = {
 
 const typeLabel: Record<NotificationType, string> = {
   interview: "Interview",
-  acceptance: "Acceptance",
+  acceptance: "Offer of admission",
   rejection: "Admission",
   general: "General",
 };

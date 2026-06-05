@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { mergeFormData } from "@/lib/application-form/defaults";
 import { migrateLegacyFormData } from "@/lib/application-form/migrate-form-data";
 import type { ApplicationFormData } from "@/types/application-form";
+import type { ProgrammeLevelChoice } from "@/types/application-form";
 
 export type AcceptanceLetterCandidate = {
   studentId: number;
@@ -11,6 +12,7 @@ export type AcceptanceLetterCandidate = {
   programmeName: string;
   programmeDepartment: string;
   courseName: string | null;
+  programmeLevels: ProgrammeLevelChoice[];
   admissionYear: string;
   generatedAt: string | null;
   letterReference: string | null;
@@ -58,6 +60,7 @@ export async function listAcceptanceLetterCandidates(): Promise<
       programmeName: application.programme.programmeName,
       programmeDepartment: application.programme.department,
       courseName: payload.enrolment?.firstChoiceCourse ?? null,
+      programmeLevels: payload.enrolment?.programmeLevels ?? [],
       admissionYear: String(application.submittedAt.getUTCFullYear()),
       generatedAt: application.student.acceptanceLetter?.generatedAt.toISOString() ?? null,
       letterReference: application.student.acceptanceLetter?.letterReference ?? null,
@@ -106,6 +109,7 @@ export async function getAcceptanceLetterCandidateByStudentId(studentId: number)
     programmeName: application.programme.programmeName,
     programmeDepartment: application.programme.department,
     courseName: payload.enrolment?.firstChoiceCourse ?? null,
+    programmeLevels: payload.enrolment?.programmeLevels ?? [],
     admissionYear: String(application.submittedAt.getUTCFullYear()),
     letter: application.student.acceptanceLetter
       ? {

@@ -31,6 +31,23 @@ export function formatDateLong(date: Date | string): string {
   return `${day}${suffix} ${monthYear}`;
 }
 
+/** e.g. 10th October, 2026 (matches offer-of-admission letter template) */
+export function formatDateForOffer(date: Date | string): string {
+  const d = new Date(date);
+  const day = d.getDate();
+  const suffix =
+    day % 10 === 1 && day !== 11
+      ? "st"
+      : day % 10 === 2 && day !== 12
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+          ? "rd"
+          : "th";
+
+  const month = new Intl.DateTimeFormat("en-GB", { month: "long" }).format(d);
+  return `${day}${suffix} ${month}, ${d.getFullYear()}`;
+}
+
 export function formatTime(date: Date | string): string {
   return new Intl.DateTimeFormat("en-GB", {
     hour: "numeric",

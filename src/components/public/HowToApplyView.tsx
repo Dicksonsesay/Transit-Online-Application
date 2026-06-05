@@ -60,7 +60,7 @@ const mainSteps: ApplyStep[] = [
     step: 5,
     title: "Submit and track your progress",
     description:
-      "Submit your completed application to receive an application number. Use your student dashboard to check status, messages, interview details, and your acceptance letter when available.",
+      "Submit your completed application to receive an application number. Use your student dashboard to check status, messages, interview details, and your offer of admission when available.",
     icon: FiLogIn,
     href: "/auth/login",
     linkLabel: "Go to student login",
@@ -79,8 +79,8 @@ const afterSubmission = [
     icon: FiCalendar,
   },
   {
-    title: "Decision & acceptance letter",
-    description: "When accepted, your dashboard updates and your official acceptance letter becomes available to view or download.",
+    title: "Decision & offer of admission",
+    description: "When accepted, your dashboard updates and your official offer of admission becomes available to view or download.",
     icon: FiMail,
   },
 ];

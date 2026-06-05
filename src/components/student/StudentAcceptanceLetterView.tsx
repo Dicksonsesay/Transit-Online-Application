@@ -29,10 +29,10 @@ function PendingAcceptanceView() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <StudentPageHero
-        badge="Acceptance letter"
+        badge="Offer of admission"
         icon={FiAward}
-        title="Letter not available yet"
-        description="Your official acceptance letter will appear here once the admissions office marks your application as accepted and publishes the document."
+        title="Offer not available yet"
+        description="Your official offer of admission will appear here once the admissions office marks your application as accepted and publishes the document."
       />
       <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm ring-1 ring-slate-900/5">
         <div className="px-6 py-10 text-center sm:px-10">
@@ -44,7 +44,7 @@ function PendingAcceptanceView() {
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-zinc-600">
             Continue checking your portal Messages and email. When you are accepted, you
-            will be able to download your letter from this page.
+            will be able to download your offer of admission from this page.
           </p>
           <Link
             href="/student/status"
@@ -77,7 +77,7 @@ export default function StudentAcceptanceLetterView({
         badge="Congratulations"
         icon={FiAward}
         title="You have been accepted!"
-        description="Welcome to Transit College Sierra Leone. Your admission has been confirmed—download your official acceptance letter below."
+        description="Welcome to Transit College Sierra Leone. Your admission has been confirmed—download your official offer of admission below."
         accentClass="from-[var(--dark-blue)] via-[var(--hero-blue)] to-[#0d4a94]"
       />
 
@@ -121,7 +121,7 @@ export default function StudentAcceptanceLetterView({
           </div>
           <div className="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-4">
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-zinc-500">
-              Letter status
+              Offer status
             </p>
             {letter ? (
               <>
@@ -141,7 +141,7 @@ export default function StudentAcceptanceLetterView({
                   Being prepared
                 </p>
                 <p className="mt-2 text-xs leading-relaxed text-zinc-600">
-                  Your letter is being finalised. Check back soon or watch your email.
+                  Your offer is being finalised. Check back soon or watch your email.
                 </p>
               </>
             )}
@@ -156,7 +156,7 @@ export default function StudentAcceptanceLetterView({
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary-yellow)] px-6 py-3 text-sm font-bold text-[var(--dark-blue)] shadow-sm hover:opacity-95"
               >
                 <FiDownload size={18} aria-hidden />
-                Download acceptance letter
+                Download offer of admission
               </a>
               <a
                 href="/api/student/acceptance-letter/pdf"
@@ -175,7 +175,7 @@ export default function StudentAcceptanceLetterView({
               className="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 px-6 py-3 text-sm font-bold text-slate-500"
             >
               <FiDownload size={18} aria-hidden />
-              Letter not ready yet
+              Offer not ready yet
             </button>
           )}
         </div>
@@ -184,7 +184,7 @@ export default function StudentAcceptanceLetterView({
       <div className="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/80 px-5 py-4 text-sm text-blue-900">
         <FiFileText className="mt-0.5 shrink-0" size={18} aria-hidden />
         <p>
-          Save or print your acceptance letter for registration and official records. Contact
+          Save or print your offer of admission for registration and official records. Contact
           admissions if any detail needs correction.
         </p>
       </div>

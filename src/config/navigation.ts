@@ -12,7 +12,7 @@ export const studentNav: NavItem[] = [
   { label: "Documents", href: `${studentBase}/documents` },
   { label: "Interview", href: `${studentBase}/interview` },
   { label: "Messages", href: `${studentBase}/messages` },
-  { label: "Acceptance Letter", href: `${studentBase}/acceptance-letter` },
+  { label: "Offer of Admission", href: `${studentBase}/acceptance-letter` },
 ];
 
 export const adminNav: NavItem[] = [
@@ -20,7 +20,7 @@ export const adminNav: NavItem[] = [
   { label: "Applicants", href: "/admin/applicants" },
   { label: "PIN Management", href: "/admin/pins" },
   { label: "Interviews", href: "/admin/interviews" },
-  { label: "Acceptance Letters", href: "/admin/acceptance-letters" },
+  { label: "Offers of Admission", href: "/admin/acceptance-letters" },
   { label: "Reports", href: "/admin/reports" },
   { label: "Settings", href: "/admin/settings" },
 ];

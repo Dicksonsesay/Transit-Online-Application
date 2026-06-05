@@ -27,7 +27,7 @@ const initialState: { error?: string; success?: boolean } = {};
 const typeOptions: { value: NotificationType; label: string }[] = [
   { value: "general", label: "General message" },
   { value: "interview", label: "Interview update" },
-  { value: "acceptance", label: "Acceptance" },
+  { value: "acceptance", label: "Offer of admission" },
   { value: "rejection", label: "Rejection" },
 ];
 

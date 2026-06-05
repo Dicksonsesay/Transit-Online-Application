@@ -3,7 +3,7 @@ export const adminPageTitles: Record<string, string> = {
   "/admin/applicants": "Applicants",
   "/admin/pins": "PIN Management",
   "/admin/interviews": "Interviews",
-  "/admin/acceptance-letters": "Acceptance Letters",
+  "/admin/acceptance-letters": "Offers of Admission",
   "/admin/reports": "Reports",
   "/admin/settings": "Settings",
   "/admin/profile": "Profile",

@@ -86,7 +86,7 @@ const metricCards: {
     valueClass: "text-violet-800",
   },
   {
-    label: "Acceptance Letters",
+    label: "Offers of Admission",
     key: "acceptanceLetters",
     icon: FiMail,
     cardClass: "border-teal-200 bg-gradient-to-br from-teal-50 via-white to-cyan-50",
@@ -107,7 +107,7 @@ export default function AdminReportsView({ report }: AdminReportsViewProps) {
             <h2 className="text-lg font-bold text-[var(--primary-blue)]">Admissions Report</h2>
             <p className="mt-1 max-w-2xl text-sm text-zinc-500">
               Operational snapshot for applications, interviews, PIN issuance, and
-              acceptance letters.
+              offers of admission.
             </p>
             <p className="mt-2 text-xs text-zinc-400">
               Generated: {formatDate(report.generatedAt)}

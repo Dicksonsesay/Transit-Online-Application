@@ -23,7 +23,7 @@ const navIcons: Record<string, IconType> = {
   Applicants: FiUsers,
   "PIN Management": FiKey,
   Interviews: FiCalendar,
-  "Acceptance Letters": FiAward,
+  "Offers of Admission": FiAward,
   Reports: FiPieChart,
   Settings: FiSettings,
 };

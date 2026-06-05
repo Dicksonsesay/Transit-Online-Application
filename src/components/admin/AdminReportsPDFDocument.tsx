@@ -72,7 +72,7 @@ export default function AdminReportsPDFDocument({
           ["Interviews Scheduled", report.totals.interviewsScheduled],
           ["Interviews Completed", report.totals.interviewsCompleted],
           ["PINs Issued", report.totals.pinsIssued],
-          ["Acceptance Letters", report.totals.acceptanceLetters],
+          ["Offers of Admission", report.totals.acceptanceLetters],
         ].map(([label, value]) => (
           <View key={String(label)} style={styles.row}>
             <Text style={styles.label}>{label}</Text>

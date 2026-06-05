@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { mergeFormData } from "@/lib/application-form/defaults";
 import { migrateLegacyFormData } from "@/lib/application-form/migrate-form-data";
-import type { ApplicationFormData } from "@/types/application-form";
+import type { ApplicationFormData, ProgrammeLevelChoice } from "@/types/application-form";
 
 export async function getStudentAcceptanceLetter(studentId: number) {
   const student = await prisma.student.findUnique({
@@ -45,6 +45,7 @@ export async function getStudentAcceptanceLetter(studentId: number) {
     programmeName: student.application.programme.programmeName,
     programmeDepartment: student.application.programme.department,
     courseName: formData.enrolment?.firstChoiceCourse ?? null,
+    programmeLevels: (formData.enrolment?.programmeLevels ?? []) as ProgrammeLevelChoice[],
     admissionYear: String(student.application.submittedAt.getUTCFullYear()),
     letter: student.acceptanceLetter
       ? {
