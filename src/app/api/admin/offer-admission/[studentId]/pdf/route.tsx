@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { getAcceptanceLetterCandidateByStudentId } from "@/lib/admin-acceptance-letters";
 import { buildOfferOfAdmissionInput } from "@/lib/offer-of-admission/build-input";
 import { generateOfferOfAdmissionPdf } from "@/lib/offer-of-admission/generate-pdf";
+import { offerOfAdmissionPdfResponse } from "@/lib/offer-of-admission/pdf-response";
 import { requireAdminSession } from "@/lib/session";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET(
   request: Request,
@@ -42,10 +46,5 @@ export async function GET(
     applicant.applicationNumber ?? `student-${studentId}`
   }.pdf`;
 
-  return new NextResponse(Buffer.from(pdfBytes), {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `${download ? "attachment" : "inline"}; filename="${fileName}"`,
-    },
-  });
+  return offerOfAdmissionPdfResponse(pdfBytes, fileName, download);
 }

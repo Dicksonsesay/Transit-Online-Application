@@ -5,7 +5,7 @@ export function getNotificationHref(type: NotificationType): string {
     case "interview":
       return "/student/interview";
     case "acceptance":
-      return "/student/acceptance-letter";
+      return "/student/offer-admission";
     case "rejection":
       return "/student/status";
     case "general":

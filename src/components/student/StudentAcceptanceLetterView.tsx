@@ -58,6 +58,14 @@ function PendingAcceptanceView() {
   );
 }
 
+function buildOfferPdfUrl(download: boolean, letter: StudentAcceptanceLetterViewProps["letter"]) {
+  const params = new URLSearchParams();
+  if (download) params.set("download", "1");
+  // Bust browser/CDN cache when the offer is regenerated.
+  params.set("v", letter?.generatedAt ?? "current");
+  return `/api/student/offer-admission/pdf?${params.toString()}`;
+}
+
 export default function StudentAcceptanceLetterView({
   studentName,
   applicationStatus,
@@ -70,6 +78,9 @@ export default function StudentAcceptanceLetterView({
   if (applicationStatus !== "accepted") {
     return <PendingAcceptanceView />;
   }
+
+  const downloadPdfUrl = buildOfferPdfUrl(true, letter);
+  const openPdfUrl = buildOfferPdfUrl(false, letter);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
@@ -149,35 +160,22 @@ export default function StudentAcceptanceLetterView({
         </div>
 
         <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-5 sm:flex-row sm:flex-wrap sm:px-8">
-          {letter ? (
-            <>
-              <a
-                href="/api/student/acceptance-letter/pdf?download=1"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary-yellow)] px-6 py-3 text-sm font-bold text-[var(--dark-blue)] shadow-sm hover:opacity-95"
-              >
-                <FiDownload size={18} aria-hidden />
-                Download offer of admission
-              </a>
-              <a
-                href="/api/student/acceptance-letter/pdf"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-6 py-3 text-sm font-bold text-[var(--primary-blue)] hover:bg-slate-50"
-              >
-                <FiExternalLink size={18} aria-hidden />
-                Open PDF
-              </a>
-            </>
-          ) : (
-            <button
-              type="button"
-              disabled
-              className="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 px-6 py-3 text-sm font-bold text-slate-500"
-            >
-              <FiDownload size={18} aria-hidden />
-              Offer not ready yet
-            </button>
-          )}
+          <a
+            href={downloadPdfUrl}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary-yellow)] px-6 py-3 text-sm font-bold text-[var(--dark-blue)] shadow-sm hover:opacity-95"
+          >
+            <FiDownload size={18} aria-hidden />
+            Download offer of admission
+          </a>
+          <a
+            href={openPdfUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-6 py-3 text-sm font-bold text-[var(--primary-blue)] hover:bg-slate-50"
+          >
+            <FiExternalLink size={18} aria-hidden />
+            Open PDF
+          </a>
         </div>
       </section>
 

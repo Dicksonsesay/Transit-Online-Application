@@ -87,7 +87,7 @@ export async function deleteNotificationAction(
 
   revalidatePath("/student");
   revalidatePath("/student/messages");
-  revalidatePath("/student/acceptance-letter");
+  revalidatePath("/student/offer-admission");
   revalidatePath("/student/interview");
 
   return { success: true };

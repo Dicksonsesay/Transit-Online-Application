@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { buildOfferOfAdmissionInput } from "@/lib/offer-of-admission/build-input";
 import { generateOfferOfAdmissionPdf } from "@/lib/offer-of-admission/generate-pdf";
+import { offerOfAdmissionPdfResponse } from "@/lib/offer-of-admission/pdf-response";
 import { getStudentAcceptanceLetter } from "@/lib/student-acceptance-letter";
 import { requireStudentSession } from "@/lib/session";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const session = await requireStudentSession();
@@ -16,7 +20,7 @@ export async function GET(request: Request) {
   }
 
   const letter = await getStudentAcceptanceLetter(studentId);
-  if (!letter || letter.applicationStatus !== "accepted" || !letter.letter) {
+  if (!letter || letter.applicationStatus !== "accepted") {
     return NextResponse.json({ error: "Offer of admission not available." }, { status: 404 });
   }
 
@@ -29,17 +33,12 @@ export async function GET(request: Request) {
       programmeName: letter.programmeName,
       courseName: letter.courseName,
       admissionYear: letter.admissionYear,
-      generatedAt: letter.letter.generatedAt,
+      generatedAt: letter.letter?.generatedAt ?? new Date().toISOString(),
       programmeLevels: letter.programmeLevels,
     })
   );
 
   const fileName = `Offer-of-Admission-${letter.studentName.replace(/\s+/g, "-")}.pdf`;
 
-  return new NextResponse(Buffer.from(pdfBytes), {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `${download ? "attachment" : "inline"}; filename="${fileName}"`,
-    },
-  });
+  return offerOfAdmissionPdfResponse(pdfBytes, fileName, download);
 }

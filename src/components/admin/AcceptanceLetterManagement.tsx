@@ -250,7 +250,7 @@ export default function AcceptanceLetterManagement({
                     <div className="flex flex-wrap justify-end gap-2">
                       {item.generatedAt ? (
                         <a
-                          href={`/api/admin/acceptance-letters/${item.studentId}/pdf?download=1`}
+                          href={`/api/admin/offer-admission/${item.studentId}/pdf?download=1`}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-bold text-zinc-700 shadow-sm hover:bg-slate-50"

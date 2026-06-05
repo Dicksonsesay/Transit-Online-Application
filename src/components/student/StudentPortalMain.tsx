@@ -9,7 +9,7 @@ const pageTitles: Record<string, string> = {
   "/student": "Student Dashboard",
   "/student/application": "Application Form",
   "/student/interview": "Interview",
-  "/student/acceptance-letter": "Offer of Admission",
+  "/student/offer-admission": "Offer of Admission",
   "/student/change-password": "Change Password",
   "/student/profile": "My Profile",
   "/student/status": "Admission Status",

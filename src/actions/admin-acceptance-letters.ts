@@ -21,14 +21,14 @@ async function upsertAcceptanceLetter(studentId: number, adminId: number) {
       generatedById: adminId,
       generatedAt: new Date(),
       letterReference: reference,
-      pdfPath: `/api/admin/acceptance-letters/${studentId}/pdf?download=1`,
+      pdfPath: `/api/admin/offer-admission/${studentId}/pdf?download=1`,
     },
     create: {
       studentId,
       generatedById: adminId,
       generatedAt: new Date(),
       letterReference: reference,
-      pdfPath: `/api/admin/acceptance-letters/${studentId}/pdf?download=1`,
+      pdfPath: `/api/admin/offer-admission/${studentId}/pdf?download=1`,
     },
   });
 }
@@ -53,10 +53,10 @@ export async function generateAcceptanceLetterAction(studentId: number) {
 
   const letter = await upsertAcceptanceLetter(studentId, adminId);
 
-  revalidatePath("/admin/acceptance-letters");
+  revalidatePath("/admin/offer-admission");
   revalidatePath("/admin/applicants");
   revalidatePath(`/admin/applicants/${studentId}`);
-  revalidatePath("/student/acceptance-letter");
+  revalidatePath("/student/offer-admission");
 
   return { success: true, letterReference: letter.letterReference };
 }
@@ -89,10 +89,10 @@ export async function sendAcceptanceLetterAction(studentId: number) {
       "Congratulations! Your offer of admission has been published. Open your student portal to view or download it. A copy of this notice has been sent to your registered email.",
   });
 
-  revalidatePath("/admin/acceptance-letters");
+  revalidatePath("/admin/offer-admission");
   revalidatePath("/student");
   revalidatePath("/student/messages");
-  revalidatePath("/student/acceptance-letter");
+  revalidatePath("/student/offer-admission");
 
   return { success: true, letterReference: letter.letterReference };
 }
