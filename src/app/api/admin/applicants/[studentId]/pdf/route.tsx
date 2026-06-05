@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import ApplicationPDFDocument from "@/components/student/application/ApplicationPDFDocument";
 import { getApplicantByStudentId } from "@/lib/admin-applicants";
+import { resolvePublicFileUrl } from "@/lib/student-upload";
 import { requireAdminSession } from "@/lib/session";
 
 export async function GET(
@@ -28,9 +29,8 @@ export async function GET(
   const download = url.searchParams.get("download") === "1";
   const baseOrigin = url.origin;
 
-  const passportPhotoUrl = applicant.passportPhoto
-    ? `${baseOrigin}${applicant.passportPhoto}`
-    : null;
+  const passportPhotoUrl =
+    resolvePublicFileUrl(applicant.passportPhoto, baseOrigin) ?? null;
 
   const pdfBuffer = await renderToBuffer(
     <ApplicationPDFDocument

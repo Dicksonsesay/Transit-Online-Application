@@ -6,6 +6,9 @@ import {
 } from "@/lib/student-upload";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 const CATEGORIES = new Set<UploadCategory>([
   "passport_photo",
   "wassce",

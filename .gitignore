@@ -42,6 +42,9 @@ next-env.d.ts
 
 /src/generated/prisma
 
+# Local dev uploads (production uses Vercel Blob)
+/public/uploads/
+
 # local portable git (do not commit)
 .tools/
 

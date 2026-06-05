@@ -3,6 +3,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { prisma } from "@/lib/prisma";
 import { requireStudentSession } from "@/lib/session";
 import ApplicationPDFDocument from "@/components/student/application/ApplicationPDFDocument";
+import { resolvePublicFileUrl } from "@/lib/student-upload";
 import type { ApplicationFormData } from "@/types/application-form";
 
 export async function GET(request: Request) {
@@ -39,9 +40,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Application not found" }, { status: 404 });
   }
 
-  const passportPhotoUrl = student.passportPhoto
-    ? `${baseOrigin}${student.passportPhoto}`
-    : null;
+  const passportPhotoUrl =
+    resolvePublicFileUrl(student.passportPhoto, baseOrigin) ?? null;
 
   const pdfBuffer = await renderToBuffer(
     <ApplicationPDFDocument

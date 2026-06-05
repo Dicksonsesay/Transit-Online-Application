@@ -113,6 +113,7 @@ export default function PassportPhotoCapture({
       const data = (await res.json()) as { filePath?: string; error?: string };
 
       if (!res.ok || !data.filePath) {
+        setPreview(photoUrl ?? "");
         await showError("Upload failed", data.error ?? "Could not upload photo.");
         return;
       }
