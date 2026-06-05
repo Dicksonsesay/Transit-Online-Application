@@ -36,7 +36,7 @@ export async function GET(request: Request) {
 
   const fileName = `Offer-of-Admission-${letter.studentName.replace(/\s+/g, "-")}.pdf`;
 
-  return new NextResponse(pdfBytes, {
+  return new NextResponse(Buffer.from(pdfBytes), {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `${download ? "attachment" : "inline"}; filename="${fileName}"`,
