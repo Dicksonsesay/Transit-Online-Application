@@ -55,7 +55,7 @@ async function saveToBlobStorage(
   contentType: string
 ): Promise<string> {
   const blob = await put(`students/${studentId}/${fileName}`, buffer, {
-    access: "public",
+    access: "private",
     contentType,
     addRandomSuffix: false,
   });
