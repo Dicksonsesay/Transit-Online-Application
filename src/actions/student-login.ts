@@ -105,7 +105,8 @@ export async function loginStudentAction(
       };
     }
 
-    const valid = await bcrypt.compare(password, student.password);
+    const passwordHash = student.password;
+    const valid = await bcrypt.compare(password, passwordHash);
     if (!valid) {
       return { error: "Invalid PIN or password." };
     }

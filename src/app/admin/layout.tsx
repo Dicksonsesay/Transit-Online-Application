@@ -5,6 +5,8 @@ import PageLoadingScreen from "@/components/shared/PageLoadingScreen";
 import { getAdminAlertCount, getAdminNavbarAlerts } from "@/lib/admin-alerts";
 import { requireAdminSession } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const session = await requireAdminSession();
 

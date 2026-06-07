@@ -6,6 +6,8 @@ import { getStudentNavbarNotifications } from "@/lib/notifications";
 import { getUnreadNotificationCount } from "@/lib/student-dashboard";
 import { requireStudentSession } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 async function StudentPortalLayoutContent({
   children,
 }: {
