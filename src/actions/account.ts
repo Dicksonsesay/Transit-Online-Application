@@ -125,9 +125,17 @@ export async function changeStudentPasswordAction(
     return { error: "Student account was not found." };
   }
 
+  const passwordHash = student.password;
+  if (!passwordHash) {
+    return {
+      error:
+        "Your account uses Google sign-in and does not have a password to change.",
+    };
+  }
+
   const currentPasswordIsValid = await bcrypt.compare(
     fields.currentPassword,
-    student.password
+    passwordHash
   );
 
   if (!currentPasswordIsValid) {
