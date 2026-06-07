@@ -12,6 +12,7 @@ import {
 } from "@/lib/application-form-display";
 import { applicationStatusLabel } from "@/lib/application-status";
 import type { ApplicantDetail } from "@/lib/admin-applicants";
+import { toStudentFileDisplayUrl } from "@/lib/student-file-url";
 import { formatDate } from "@/lib/utils";
 import { DOCUMENT_TYPE_LABELS } from "@/types/application-form";
 
@@ -33,6 +34,7 @@ export default function ApplicantDetailView({ applicant }: ApplicantDetailViewPr
   const guardian = data.parentGuardian;
   const sponsorship = data.sponsorship;
   const documents = data.documents;
+  const fileUrl = toStudentFileDisplayUrl;
 
   return (
     <div className="space-y-6">
@@ -41,7 +43,7 @@ export default function ApplicantDetailView({ applicant }: ApplicantDetailViewPr
           {applicant.passportPhoto ? (
             <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200">
               <Image
-                src={applicant.passportPhoto}
+                src={toStudentFileDisplayUrl(applicant.passportPhoto)}
                 alt={applicant.fullname}
                 fill
                 className="object-cover"
@@ -245,7 +247,7 @@ export default function ApplicantDetailView({ applicant }: ApplicantDetailViewPr
             label="WASSCE / Testimonial"
             value={
               documents?.wassce ? (
-                <Link href={documents.wassce.filePath} target="_blank" className="text-[var(--primary-blue)] hover:underline">
+                <Link href={fileUrl(documents.wassce.filePath)} target="_blank" className="text-[var(--primary-blue)] hover:underline">
                   {documents.wassce.fileName}
                 </Link>
               ) : (
@@ -257,7 +259,7 @@ export default function ApplicantDetailView({ applicant }: ApplicantDetailViewPr
             label="Birth Certificate"
             value={
               documents?.birthCertificate ? (
-                <Link href={documents.birthCertificate.filePath} target="_blank" className="text-[var(--primary-blue)] hover:underline">
+                <Link href={fileUrl(documents.birthCertificate.filePath)} target="_blank" className="text-[var(--primary-blue)] hover:underline">
                   {documents.birthCertificate.fileName}
                 </Link>
               ) : (
@@ -269,7 +271,7 @@ export default function ApplicantDetailView({ applicant }: ApplicantDetailViewPr
             label="National ID"
             value={
               documents?.nationalId ? (
-                <Link href={documents.nationalId.filePath} target="_blank" className="text-[var(--primary-blue)] hover:underline">
+                <Link href={fileUrl(documents.nationalId.filePath)} target="_blank" className="text-[var(--primary-blue)] hover:underline">
                   {documents.nationalId.fileName}
                 </Link>
               ) : (
@@ -284,7 +286,7 @@ export default function ApplicantDetailView({ applicant }: ApplicantDetailViewPr
             {documents.other.map((doc, i) => (
               <Link
                 key={i}
-                href={doc.filePath}
+                href={fileUrl(doc.filePath)}
                 target="_blank"
                 className="block text-sm text-[var(--primary-blue)] hover:underline"
               >
@@ -298,7 +300,7 @@ export default function ApplicantDetailView({ applicant }: ApplicantDetailViewPr
             <p className="text-xs font-medium uppercase text-zinc-500">All uploads on file</p>
             {applicant.uploadedDocuments.map((doc, i) => (
               <div key={i} className="flex justify-between gap-2 text-sm">
-                <Link href={doc.filePath} target="_blank" className="text-[var(--primary-blue)] hover:underline">
+                <Link href={fileUrl(doc.filePath)} target="_blank" className="text-[var(--primary-blue)] hover:underline">
                   {DOCUMENT_LABELS[doc.documentType] ?? doc.documentType}
                 </Link>
                 <span className="text-zinc-400">{formatDate(doc.uploadedAt)}</span>
