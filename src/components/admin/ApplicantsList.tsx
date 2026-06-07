@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   FiCheckCircle,
   FiClock,
-  FiEye,
   FiFileText,
   FiUserCheck,
   FiUsers,
@@ -23,6 +21,7 @@ import {
   AdminTd,
   AdminTh,
 } from "@/components/admin/ui/AdminTable";
+import ApplicantDecisionActions from "@/components/admin/ApplicantDecisionActions";
 import { applicationStatusLabel } from "@/lib/application-status";
 import type { ApplicantListItem } from "@/lib/admin-applicants";
 import type { ApplicationStatus } from "@/generated/prisma/client";
@@ -162,7 +161,7 @@ export default function ApplicantsList({ applicants, stats }: ApplicantsListProp
 
       <AdminTableShell
         title="Application register"
-        subtitle="Click view to open the full applicant record"
+        subtitle="Accept or reject after interview · View opens the full applicant record"
         countLabel={`${filtered.length} applicant${filtered.length === 1 ? "" : "s"}`}
       >
         <AdminTable>
@@ -173,7 +172,7 @@ export default function ApplicantsList({ applicants, stats }: ApplicantsListProp
             <AdminTh>Programme</AdminTh>
             <AdminTh>Status</AdminTh>
             <AdminTh>Submitted</AdminTh>
-            <AdminTh className="text-right">Actions</AdminTh>
+            <AdminTh className="min-w-[11rem] text-right">Decision</AdminTh>
           </AdminTableHead>
           <AdminTableBody>
             {filtered.length === 0 ? (
@@ -239,13 +238,11 @@ export default function ApplicantsList({ applicants, stats }: ApplicantsListProp
                     </span>
                   </AdminTd>
                   <AdminTd className="text-right">
-                    <Link
-                      href={`/admin/applicants/${applicant.studentId}`}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--hero-blue)] px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:opacity-95"
-                    >
-                      <FiEye size={14} aria-hidden />
-                      View
-                    </Link>
+                    <ApplicantDecisionActions
+                      studentId={applicant.studentId}
+                      fullname={applicant.fullname}
+                      applicationStatus={applicant.applicationStatus}
+                    />
                   </AdminTd>
                 </AdminTableRow>
               ))

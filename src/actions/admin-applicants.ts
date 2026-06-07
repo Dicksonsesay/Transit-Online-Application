@@ -68,5 +68,41 @@ export async function updateApplicationStatusAction(
   revalidatePath("/student/messages");
   revalidatePath("/student/status");
 
+  if (status === "accepted") {
+    revalidatePath("/admin/offer-admission");
+    revalidatePath("/student/offer-admission");
+  }
+
   return { success: true };
+}
+
+export async function decideApplicantAfterInterviewAction(
+  studentId: number,
+  decision: "accepted" | "rejected"
+): Promise<{ error?: string; success?: boolean }> {
+  const session = await requireAdminSession();
+  if (!session) {
+    return { error: "You must be signed in as an admin." };
+  }
+
+  if (!Number.isInteger(studentId) || studentId < 1) {
+    return { error: "Invalid applicant." };
+  }
+
+  const application = await prisma.application.findUnique({
+    where: { studentId },
+    select: { applicationStatus: true },
+  });
+
+  if (!application) {
+    return { error: "Application not found." };
+  }
+
+  if (application.applicationStatus !== "interviewed") {
+    return {
+      error: "Only applicants who have completed their interview can be accepted or rejected here.",
+    };
+  }
+
+  return updateApplicationStatusAction(studentId, decision);
 }
