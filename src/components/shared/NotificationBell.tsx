@@ -143,7 +143,12 @@ export default function NotificationBell({
             aria-label="Close notifications"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 z-40 mt-2 w-[min(100vw-2rem,22rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+          <div
+            className={cn(
+              "z-50 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl",
+              "fixed left-4 right-4 top-[4.25rem] sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[min(calc(100vw-2rem),22rem)]"
+            )}
+          >
             <div className="border-b border-slate-100 px-4 py-3">
               <p className="text-sm font-bold text-[var(--primary-blue)]">Notifications</p>
               {unreadCount > 0 ? (

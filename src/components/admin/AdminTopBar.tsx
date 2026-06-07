@@ -34,7 +34,7 @@ export default function AdminTopBar({
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="flex shrink-0 items-center justify-between gap-4 border-b border-[var(--dark-blue)]/15 bg-[var(--primary-yellow)] px-4 py-3 shadow-sm sm:px-6 lg:px-8">
+    <header className="relative z-20 flex shrink-0 items-center justify-between gap-4 overflow-visible border-b border-[var(--dark-blue)]/15 bg-[var(--primary-yellow)] px-4 py-3 shadow-sm sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         {onMenuClick ? (
           <button

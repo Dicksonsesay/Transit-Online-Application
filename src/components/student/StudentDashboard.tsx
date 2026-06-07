@@ -76,13 +76,13 @@ export default function StudentDashboard({
         dashboardTitle="Student Dashboard"
         userName={studentName}
         description="Track your application status, interview schedule, messages, and admission documents."
+        badge={
+          applicationNumber
+            ? { label: "Application No.", value: applicationNumber }
+            : undefined
+        }
+        variant="student"
       />
-
-      {applicationNumber ? (
-        <p className="-mt-2 text-sm font-medium text-[var(--primary-blue)]/80">
-          Application No: {applicationNumber}
-        </p>
-      ) : null}
 
       {progressSteps ? (
         <ApplicationStatusProgress steps={progressSteps} />

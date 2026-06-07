@@ -23,6 +23,7 @@ export default async function AdminDashboardPage() {
         dashboardTitle="Admin Dashboard"
         userName={adminName}
         description="Centralize applicant review, interviews, offers of admission, notifications, and reporting from one professional workspace."
+        variant="admin"
       />
 
       <AdminDashboardOverview
