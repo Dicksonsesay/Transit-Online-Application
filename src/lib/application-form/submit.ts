@@ -1,6 +1,7 @@
 import { createStudentNotification } from "@/lib/notifications";
 import { prisma } from "@/lib/prisma";
 import { mergeFormData } from "@/lib/application-form/defaults";
+import { matchCollegeProgrammeName } from "@/lib/application-form/programme-resolution";
 import {
   declarationSchema,
   documentsSchema,
@@ -47,14 +48,35 @@ async function resolveProgrammeId(
 ): Promise<number> {
   const search = enrolment?.firstChoiceCourse?.trim();
   if (search) {
-    const match = await prisma.programme.findFirst({
+    const collegeMatch = matchCollegeProgrammeName(search);
+    if (collegeMatch) {
+      const matched = await prisma.programme.findFirst({
+        where: {
+          status: "active",
+          programmeName: { equals: collegeMatch, mode: "insensitive" },
+        },
+        select: { id: true },
+      });
+      if (matched) return matched.id;
+    }
+
+    const exact = await prisma.programme.findFirst({
+      where: {
+        status: "active",
+        programmeName: { equals: search, mode: "insensitive" },
+      },
+      select: { id: true },
+    });
+    if (exact) return exact.id;
+
+    const partial = await prisma.programme.findFirst({
       where: {
         status: "active",
         programmeName: { contains: search, mode: "insensitive" },
       },
       select: { id: true },
     });
-    if (match) return match.id;
+    if (partial) return partial.id;
   }
 
   const fallback = await prisma.programme.findFirst({

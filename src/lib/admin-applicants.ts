@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { mergeFormData } from "@/lib/application-form/defaults";
+import {
+  matchCollegeProgrammeName,
+  resolveApplicantProgrammeDisplay,
+} from "@/lib/application-form/programme-resolution";
 import { migrateLegacyFormData } from "@/lib/application-form/migrate-form-data";
 import type { ApplicationFormData } from "@/types/application-form";
 import type { ApplicationStatus } from "@/generated/prisma/client";
@@ -93,7 +97,10 @@ export async function listApplicants(): Promise<ApplicantListItem[]> {
       fullname: app.student.fullname,
       email: app.student.email,
       phone: app.student.phone,
-      programmeName: app.programme.programmeName,
+      programmeName: resolveApplicantProgrammeDisplay(
+        payload.enrolment,
+        app.programme.programmeName
+      ),
       firstChoiceCourse: payload.enrolment?.firstChoiceCourse ?? null,
       applicationStatus: app.applicationStatus,
       submittedAt: app.submittedAt.toISOString(),
@@ -147,7 +154,10 @@ export async function getApplicantByStudentId(
     phone: application.student.phone,
     gender: application.student.gender,
     passportPhoto: application.student.passportPhoto,
-    programmeName: application.programme.programmeName,
+    programmeName: resolveApplicantProgrammeDisplay(
+      formData.enrolment,
+      application.programme.programmeName
+    ),
     programmeDepartment: application.programme.department,
     applicationStatus: application.applicationStatus,
     submittedAt: application.submittedAt.toISOString(),
