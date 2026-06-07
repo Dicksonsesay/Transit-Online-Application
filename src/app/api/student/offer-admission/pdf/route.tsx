@@ -20,8 +20,11 @@ export async function GET(request: Request) {
   }
 
   const letter = await getStudentAcceptanceLetter(studentId);
-  if (!letter || letter.applicationStatus !== "accepted") {
-    return NextResponse.json({ error: "Offer of admission not available." }, { status: 404 });
+  if (!letter || letter.applicationStatus !== "accepted" || !letter.letter) {
+    return NextResponse.json(
+      { error: "Offer of admission is not available until admissions publishes it." },
+      { status: 404 }
+    );
   }
 
   const url = new URL(request.url);
@@ -33,7 +36,7 @@ export async function GET(request: Request) {
       programmeName: letter.programmeName,
       courseName: letter.courseName,
       admissionYear: letter.admissionYear,
-      generatedAt: letter.letter?.generatedAt ?? new Date().toISOString(),
+      generatedAt: letter.letter.generatedAt,
       programmeLevels: letter.programmeLevels,
     })
   );

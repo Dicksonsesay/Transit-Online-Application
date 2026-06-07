@@ -17,7 +17,7 @@ type StudentDashboardProps = {
   applicationNumber: string | null;
   applicationStatus: ApplicationStatus | null;
   applicationSubmittedAt: Date | null;
-  acceptanceLetterGeneratedAt: Date | null;
+  acceptanceLetterPublishedAt: Date | null;
   applicationDraftSection?: number | null;
   unreadMessages: number;
   interview: {
@@ -34,7 +34,7 @@ export default function StudentDashboard({
   applicationNumber,
   applicationStatus,
   applicationSubmittedAt,
-  acceptanceLetterGeneratedAt,
+  acceptanceLetterPublishedAt,
   applicationDraftSection,
   unreadMessages,
   interview,
@@ -66,7 +66,7 @@ export default function StudentDashboard({
     status: applicationStatus,
     submittedAt: applicationSubmittedAt,
     interviewDate: interview?.interviewDate ?? null,
-    acceptanceLetterGeneratedAt,
+    acceptanceLetterPublishedAt,
   });
 
   return (

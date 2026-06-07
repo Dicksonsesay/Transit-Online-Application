@@ -241,12 +241,13 @@ model Notification {
 }
 
 model AcceptanceLetter {
-  id              Int      @id @default(autoincrement())
-  studentId       Int      @unique @map("student_id")
-  letterReference String   @map("letter_reference") @db.VarChar(100)
-  pdfPath         String   @map("pdf_path") @db.VarChar(255)
-  generatedById   Int      @map("generated_by")
-  generatedAt     DateTime @default(now()) @map("generated_at")
+  id              Int       @id @default(autoincrement())
+  studentId       Int       @unique @map("student_id")
+  letterReference String    @map("letter_reference") @db.VarChar(100)
+  pdfPath         String    @map("pdf_path") @db.VarChar(255)
+  generatedById   Int       @map("generated_by")
+  generatedAt     DateTime  @default(now()) @map("generated_at")
+  publishedAt     DateTime? @map("published_at")
 
   student     Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
   generatedBy Admin   @relation("LetterGeneratedBy", fields: [generatedById], references: [id])

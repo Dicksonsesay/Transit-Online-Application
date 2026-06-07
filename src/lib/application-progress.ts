@@ -72,13 +72,13 @@ export function getAdmissionProgressSteps(input: {
   status: ApplicationStatus | null;
   submittedAt: Date | null;
   interviewDate: Date | null;
-  acceptanceLetterGeneratedAt: Date | null;
+  acceptanceLetterPublishedAt: Date | null;
 }): AdmissionProgressStepView[] | null {
   if (!input.status || !input.submittedAt) {
     return null;
   }
 
-  const hasAcceptanceLetter = Boolean(input.acceptanceLetterGeneratedAt);
+  const hasAcceptanceLetter = Boolean(input.acceptanceLetterPublishedAt);
   const currentIndex = statusStepIndex(input.status, hasAcceptanceLetter);
 
   return ADMISSION_PROGRESS_STEPS.map((step) => {
@@ -94,8 +94,8 @@ export function getAdmissionProgressSteps(input: {
       date = input.submittedAt;
     } else if (step.id === "interview" && input.interviewDate) {
       date = input.interviewDate;
-    } else if (step.id === "acceptance_letter" && input.acceptanceLetterGeneratedAt) {
-      date = input.acceptanceLetterGeneratedAt;
+    } else if (step.id === "acceptance_letter" && input.acceptanceLetterPublishedAt) {
+      date = input.acceptanceLetterPublishedAt;
     }
 
     let displayLabel = step.label;

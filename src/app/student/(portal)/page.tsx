@@ -34,7 +34,7 @@ export default async function StudentDashboardPage() {
       applicationNumber={data.applicationNumber}
       applicationStatus={data.application?.applicationStatus ?? null}
       applicationSubmittedAt={data.application?.submittedAt ?? null}
-      acceptanceLetterGeneratedAt={data.acceptanceLetter?.generatedAt ?? null}
+      acceptanceLetterPublishedAt={data.acceptanceLetter?.publishedAt ?? null}
       applicationDraftSection={
         data.application ? null : data.applicationFormDraft?.currentSection ?? null
       }

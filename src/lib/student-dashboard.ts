@@ -18,7 +18,7 @@ export async function getStudentDashboardData(studentId: number) {
         select: { applicationStatus: true, submittedAt: true },
       },
       acceptanceLetter: {
-        select: { generatedAt: true },
+        select: { publishedAt: true },
       },
       interviews: {
         where: {

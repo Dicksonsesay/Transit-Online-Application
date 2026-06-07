@@ -57,12 +57,11 @@ export default function AcceptanceLetterManagement({
   }, [applicants, query]);
 
   const generatedCount = applicants.filter((item) => item.generatedAt).length;
+  const sentCount = applicants.filter((item) => item.publishedAt).length;
   const pendingCount = applicants.length - generatedCount;
-  const currentYear = new Date().getFullYear().toString();
-  const currentYearCount = applicants.filter(
-    (item) => item.admissionYear === currentYear
+  const readyToSendCount = applicants.filter(
+    (item) => item.generatedAt && !item.publishedAt
   ).length;
-
   const statCards: AdminStatItem[] = [
     {
       label: "Accepted applicants",
@@ -93,17 +92,17 @@ export default function AcceptanceLetterManagement({
     },
     {
       label: "Ready to send",
-      value: generatedCount,
-      helper: "PDF available in portal",
+      value: readyToSendCount,
+      helper: "Generated, not yet published",
       icon: FiSend,
       cardClass: "border-violet-200 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50",
       iconClass: "bg-violet-600 text-white",
       valueClass: "text-violet-800",
     },
     {
-      label: "This year",
-      value: currentYearCount,
-      helper: `${currentYear} admission year`,
+      label: "Published",
+      value: sentCount,
+      helper: "Visible to students",
       icon: FiMail,
       cardClass: "border-sky-200 bg-gradient-to-br from-sky-50 via-white to-indigo-50",
       iconClass: "bg-sky-600 text-white",
@@ -230,14 +229,24 @@ export default function AcceptanceLetterManagement({
                     </span>
                   </AdminTd>
                   <AdminTd>
-                    {item.generatedAt ? (
+                    {item.publishedAt ? (
+                      <div className="rounded-xl border border-emerald-200 bg-emerald-50/80 px-3 py-2">
+                        <p className="text-xs font-bold text-emerald-800">Published</p>
+                        <p className="mt-0.5 text-[11px] text-emerald-700/80">
+                          Sent {formatDate(item.publishedAt)}
+                        </p>
+                        <p className="mt-0.5 truncate font-mono text-[10px] text-emerald-600">
+                          {item.letterReference}
+                        </p>
+                      </div>
+                    ) : item.generatedAt ? (
                       <div className="rounded-xl border border-blue-200 bg-blue-50/80 px-3 py-2">
                         <p className="text-xs font-bold text-blue-800">Generated</p>
                         <p className="mt-0.5 text-[11px] text-blue-700/80">
                           {formatDate(item.generatedAt)}
                         </p>
-                        <p className="mt-0.5 truncate font-mono text-[10px] text-blue-600">
-                          {item.letterReference}
+                        <p className="mt-1 text-[10px] text-blue-700/70">
+                          Awaiting send to student
                         </p>
                       </div>
                     ) : (
@@ -279,7 +288,7 @@ export default function AcceptanceLetterManagement({
                         className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--hero-blue)] px-3 py-2 text-xs font-bold text-white shadow-sm hover:opacity-95 disabled:opacity-60"
                       >
                         <FiMail size={13} aria-hidden />
-                        Send
+                        {item.publishedAt ? "Resend" : "Send to student"}
                       </button>
                     </div>
                   </AdminTd>

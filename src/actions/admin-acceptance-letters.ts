@@ -12,24 +12,32 @@ function buildLetterReference(studentId: number) {
   return `TCSL-AL-${year}-${studentId}-${nonce}`;
 }
 
-async function upsertAcceptanceLetter(studentId: number, adminId: number) {
+async function upsertAcceptanceLetter(
+  studentId: number,
+  adminId: number,
+  mode: "generate" | "send"
+) {
   const reference = buildLetterReference(studentId);
+  const now = new Date();
+  const base = {
+    generatedById: adminId,
+    generatedAt: now,
+    letterReference: reference,
+    pdfPath: `/api/admin/offer-admission/${studentId}/pdf?download=1`,
+  };
+
+  if (mode === "send") {
+    return prisma.acceptanceLetter.upsert({
+      where: { studentId },
+      update: { ...base, publishedAt: now },
+      create: { studentId, ...base, publishedAt: now },
+    });
+  }
 
   return prisma.acceptanceLetter.upsert({
     where: { studentId },
-    update: {
-      generatedById: adminId,
-      generatedAt: new Date(),
-      letterReference: reference,
-      pdfPath: `/api/admin/offer-admission/${studentId}/pdf?download=1`,
-    },
-    create: {
-      studentId,
-      generatedById: adminId,
-      generatedAt: new Date(),
-      letterReference: reference,
-      pdfPath: `/api/admin/offer-admission/${studentId}/pdf?download=1`,
-    },
+    update: { ...base, publishedAt: null },
+    create: { studentId, ...base, publishedAt: null },
   });
 }
 
@@ -51,7 +59,7 @@ export async function generateAcceptanceLetterAction(studentId: number) {
     return { error: "Invalid admin session." };
   }
 
-  const letter = await upsertAcceptanceLetter(studentId, adminId);
+  const letter = await upsertAcceptanceLetter(studentId, adminId, "generate");
 
   revalidatePath("/admin/offer-admission");
   revalidatePath("/admin/applicants");
@@ -79,7 +87,7 @@ export async function sendAcceptanceLetterAction(studentId: number) {
     return { error: "Invalid admin session." };
   }
 
-  const letter = await upsertAcceptanceLetter(studentId, adminId);
+  const letter = await upsertAcceptanceLetter(studentId, adminId, "send");
 
   await createStudentNotification({
     studentId,

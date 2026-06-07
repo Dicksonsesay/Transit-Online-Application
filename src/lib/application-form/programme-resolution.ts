@@ -1,4 +1,5 @@
 import { ALL_COLLEGE_PROGRAMME_NAMES } from "@/lib/college-programmes";
+import { migrateLegacyFormData } from "@/lib/application-form/migrate-form-data";
 import type { ApplicationFormData } from "@/types/application-form";
 
 function normalizeProgrammeText(value: string): string {
@@ -19,6 +20,17 @@ export function resolveApplicantProgrammeDisplay(
   linkedProgrammeName: string
 ): string {
   return resolveApplicantCourseChoice(enrolment) ?? linkedProgrammeName;
+}
+
+/** Resolve programme display from stored application JSON and linked programme row. */
+export function resolveProgrammeFromFormPayload(
+  formPayload: unknown,
+  linkedProgrammeName: string
+): string {
+  const payload = migrateLegacyFormData(
+    (formPayload as ApplicationFormData | null) ?? {}
+  );
+  return resolveApplicantProgrammeDisplay(payload.enrolment, linkedProgrammeName);
 }
 
 /** Match a free-text course choice to a known college programme name. */

@@ -1,3 +1,4 @@
+import { resolveProgrammeFromFormPayload } from "@/lib/application-form/programme-resolution";
 import { prisma } from "@/lib/prisma";
 
 export type AdminReportsData = {
@@ -54,6 +55,7 @@ export async function getAdminReportsData(): Promise<AdminReportsData> {
       select: {
         applicationStatus: true,
         submittedAt: true,
+        formPayload: true,
         programme: { select: { programmeName: true } },
       },
       orderBy: { submittedAt: "asc" },
@@ -85,8 +87,12 @@ export async function getAdminReportsData(): Promise<AdminReportsData> {
 
   const programmeMap = new Map<string, number>();
   for (const application of applications) {
-    const current = programmeMap.get(application.programme.programmeName) ?? 0;
-    programmeMap.set(application.programme.programmeName, current + 1);
+    const programmeLabel = resolveProgrammeFromFormPayload(
+      application.formPayload,
+      application.programme.programmeName
+    );
+    const current = programmeMap.get(programmeLabel) ?? 0;
+    programmeMap.set(programmeLabel, current + 1);
   }
 
   const programmeBreakdown = Array.from(programmeMap.entries())
