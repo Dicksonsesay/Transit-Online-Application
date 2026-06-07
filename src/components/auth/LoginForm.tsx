@@ -53,9 +53,15 @@ export default function LoginForm({
           <p className="mt-0.5 text-xs text-zinc-600 sm:text-sm">
             Login to your account
           </p>
-          <p className="mt-0.5 text-xs leading-snug text-zinc-500">
-            Use your admission PIN with your password, or verify with Google.
-          </p>
+          {googleEnabled ? (
+            <p className="mt-0.5 text-xs leading-snug text-zinc-500">
+              Use your admission PIN with your password, or sign in with Google.
+            </p>
+          ) : (
+            <p className="mt-0.5 text-xs leading-snug text-zinc-500">
+              Use your admission PIN and password.
+            </p>
+          )}
         </div>
 
         <div className="relative mt-4">
