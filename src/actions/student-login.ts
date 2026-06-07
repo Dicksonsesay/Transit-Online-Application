@@ -1,14 +1,69 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
+import { GOOGLE_LOGIN_PIN_COOKIE } from "@/lib/constants";
+import { mapDatabaseAuthError } from "@/lib/database-errors";
 import { findStudentByPin } from "@/lib/student-auth";
 import { setStudentSessionCookie } from "@/lib/student-session";
 
 export type StudentLoginState = {
   error?: string;
 };
+
+export type PrepareGoogleLoginResult =
+  | { success: true }
+  | { success: false; error: string };
+
+/** Store the PIN-verified student before redirecting to Google OAuth. */
+export async function prepareGoogleLoginAction(
+  pin: string
+): Promise<PrepareGoogleLoginResult> {
+  const trimmedPin = pin.trim();
+  if (!trimmedPin) {
+    return { success: false, error: "Enter your admission PIN before Google sign-in." };
+  }
+
+  try {
+    const student = await findStudentByPin(trimmedPin);
+    if (!student) {
+      return {
+        success: false,
+        error: "Invalid PIN. Check your admission PIN and try again.",
+      };
+    }
+
+    if (
+      student.accountStatus === "suspended" ||
+      student.accountStatus === "inactive"
+    ) {
+      return {
+        success: false,
+        error: "Your account is not active. Please contact admissions.",
+      };
+    }
+
+    const cookieStore = await cookies();
+    cookieStore.set(GOOGLE_LOGIN_PIN_COOKIE, String(student.id), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 10,
+      path: "/",
+    });
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        mapDatabaseAuthError(error) ??
+        "Unable to verify your PIN for Google sign-in. Please try again.",
+    };
+  }
+}
 
 export async function loginStudentAction(
   _prevState: StudentLoginState,
@@ -43,6 +98,13 @@ export async function loginStudentAction(
       };
     }
 
+    if (!student.password) {
+      return {
+        error:
+          "This account uses Google sign-in. Enter your PIN above, then click “Sign in with Google”.",
+      };
+    }
+
     const valid = await bcrypt.compare(password, student.password);
     if (!valid) {
       return { error: "Invalid PIN or password." };
@@ -57,6 +119,10 @@ export async function loginStudentAction(
     redirect("/student");
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    return { error: "Unable to sign in. Please try again." };
+    return {
+      error:
+        mapDatabaseAuthError(error) ??
+        "Unable to sign in. Please try again.",
+    };
   }
 }

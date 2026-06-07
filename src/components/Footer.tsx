@@ -98,9 +98,16 @@ export default function Footer() {
           </div>
         </div>
 
-        <p className="mt-8 border-t border-white/10 pt-6 text-center text-xs text-white/50">
-          © {new Date().getFullYear()} Transit College Sierra Leone. All rights reserved.
-        </p>
+        <div className="mt-8 space-y-1.5 border-t border-white/10 pt-6 text-center text-xs text-white/50">
+          <p>
+            © {new Date().getFullYear()} Transit College Sierra Leone. All rights
+            reserved.
+          </p>
+          <p>
+            Developed by{" "}
+            <span className="font-medium text-white/70">Dickson Sesay</span>
+          </p>
+        </div>
       </div>
     </footer>
   );

@@ -1,16 +1,29 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { findStudentByPin } from "@/lib/student-auth";
+import { getGoogleOAuthConfig } from "@/lib/google-oauth-config";
+
+const googleOAuth = getGoogleOAuthConfig();
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/auth/login",
+    error: "/auth/login",
   },
   providers: [
+    ...(googleOAuth
+      ? [
+          GoogleProvider({
+            clientId: googleOAuth.clientId,
+            clientSecret: googleOAuth.clientSecret,
+          }),
+        ]
+      : []),
     CredentialsProvider({
       id: "student",
       name: "Student",
@@ -30,6 +43,8 @@ export const authOptions: NextAuthOptions = {
         if (student.accountStatus === "suspended" || student.accountStatus === "inactive") {
           return null;
         }
+
+        if (!student.password) return null;
 
         const valid = await bcrypt.compare(password, student.password);
         if (!valid) return null;
@@ -74,8 +89,12 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, account }) {
+      if (account?.provider === "google" && user) {
+        token.id = account.providerAccountId;
+        token.email = user.email;
+        token.name = user.name;
+      } else if (user) {
         token.role = (user as { role?: string }).role;
         token.id = user.id;
       }

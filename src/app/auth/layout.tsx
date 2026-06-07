@@ -8,8 +8,10 @@ export default function AuthLayout({
   return (
     <div className="flex h-dvh flex-col">
       <Header />
-      <main className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[var(--hero-blue)] px-4 py-2">
-        {children}
+      <main className="min-h-0 flex-1 overflow-y-auto bg-[var(--hero-blue)] px-4 py-4">
+        <div className="mx-auto flex w-full max-w-md justify-center py-2 sm:py-4">
+          {children}
+        </div>
       </main>
     </div>
   );

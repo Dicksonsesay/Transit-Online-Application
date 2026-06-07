@@ -12,7 +12,7 @@ export default function AuthScreen({
   showLogoInHeader = false,
 }: AuthScreenProps) {
   return (
-    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div className="w-full rounded-2xl bg-white shadow-xl">
       {showLogoInHeader ? (
         <div className="flex items-center gap-3 bg-[var(--primary-yellow)] px-5 py-3">
           <Image

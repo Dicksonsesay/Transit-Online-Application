@@ -50,21 +50,19 @@ export default function AdminLoginForm() {
       <form onSubmit={handleSubmit} className="px-6 py-5 sm:px-8 sm:py-6">
         <div className="flex flex-col items-center text-center">
           <Image
-            src="/logos/logo.png"
-            alt="Transit College Sierra Leone"
-            width={72}
-            height={72}
-            className="h-16 w-16 rounded-full object-cover"
+            src="/auth/admin-login.svg"
+            alt=""
+            width={80}
+            height={80}
+            className="h-20 w-20"
             priority
           />
-          <p className="mt-3 text-xs font-bold tracking-wide text-[var(--primary-blue)] sm:text-sm">
-            TRANSIT COLLEGE
-            <br />
-            SIERRA LEONE
-          </p>
-          <h1 className="mt-2 text-lg font-bold text-[var(--primary-blue)]">
+          <h1 className="mt-3 text-xl font-bold text-[var(--primary-blue)]">
             Admin Portal Login
           </h1>
+          <p className="mt-1 text-sm text-zinc-600">
+            Sign in to manage admissions
+          </p>
         </div>
 
         <div className="relative mt-5">

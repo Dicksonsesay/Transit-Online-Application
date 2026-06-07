@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" role="img" aria-label="Student login">
+  <rect width="120" height="120" rx="24" fill="#E8F0FE"/>
+  <circle cx="60" cy="44" r="18" fill="#1E4D8C"/>
+  <path d="M30 92c0-14 13.4-22 30-22s30 8 30 22" stroke="#1E4D8C" stroke-width="8" stroke-linecap="round"/>
+  <rect x="72" y="68" width="28" height="22" rx="6" fill="#F5B301"/>
+  <path d="M78 78h16M86 72v12" stroke="#1E2A44" stroke-width="3" stroke-linecap="round"/>
+</svg>

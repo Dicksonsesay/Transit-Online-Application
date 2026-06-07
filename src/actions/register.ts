@@ -5,7 +5,8 @@ import { cookies } from "next/headers";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { VERIFIED_PIN_COOKIE } from "@/lib/constants";
+import { GOOGLE_REGISTER_COOKIE, VERIFIED_PIN_COOKIE } from "@/lib/constants";
+import { registerStudentWithGoogle } from "@/lib/google-student-auth";
 import { PinStatus, StudentAccountStatus } from "@/generated/prisma/client";
 import { setStudentSessionCookie } from "@/lib/student-session";
 
@@ -133,6 +134,70 @@ export async function registerStudent(
       error: "Could not create account. Please try again.",
     };
   }
+}
+
+/** Complete registration after Google identity verification. */
+export async function registerWithGoogleAction(
+  _prevState: RegisterFormState,
+  _formData: FormData
+): Promise<RegisterFormState> {
+  const cookieStore = await cookies();
+  const rawProfile = cookieStore.get(GOOGLE_REGISTER_COOKIE)?.value;
+
+  if (!rawProfile) {
+    return {
+      error: "Google verification expired. Please sign in with Google again.",
+    };
+  }
+
+  let profile: { email: string; fullname: string; googleId: string };
+  try {
+    profile = JSON.parse(rawProfile) as {
+      email: string;
+      fullname: string;
+      googleId: string;
+    };
+  } catch {
+    return { error: "Invalid Google session. Please sign in with Google again." };
+  }
+
+  const result = await registerStudentWithGoogle(profile);
+
+  if (!result.success) {
+    return { error: result.error };
+  }
+
+  if (!process.env.NEXTAUTH_SECRET) {
+    return {
+      error:
+        "Account created but NEXTAUTH_SECRET is missing from .env. Please log in with Google.",
+    };
+  }
+
+  try {
+    const student = await prisma.student.findUnique({
+      where: { id: result.studentId },
+      select: { id: true, fullname: true, email: true },
+    });
+
+    if (!student) {
+      return { error: "Account created but session failed. Please log in." };
+    }
+
+    cookieStore.delete(GOOGLE_REGISTER_COOKIE);
+    await setStudentSessionCookie(student);
+    redirect("/student");
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    return { error: "Account created but sign-in failed. Please log in." };
+  }
+}
+
+/** Clear Google pre-fill and return to manual registration. */
+export async function clearGoogleRegisterAction(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(GOOGLE_REGISTER_COOKIE);
+  redirect("/auth/register");
 }
 
 /** Register account, set session cookie, and redirect to student dashboard. */

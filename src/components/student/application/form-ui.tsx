@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils";
 export const inputClass =
   "w-full rounded-xl border border-zinc-200 bg-slate-50/50 px-3 py-2.5 text-sm text-[var(--dark-blue)] outline-none transition-colors placeholder:text-zinc-400 focus:border-[var(--primary-blue)] focus:bg-white focus:ring-2 focus:ring-[var(--primary-blue)]/15";
 
+export const selectClass =
+  "w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-[var(--dark-blue)] outline-none transition-colors focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15 [&>option]:bg-white [&>option]:text-[var(--dark-blue)]";
+
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
     <div className="mb-6 border-b border-slate-200 pb-4">

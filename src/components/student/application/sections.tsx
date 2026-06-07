@@ -23,11 +23,13 @@ import type {
   TitleOption,
   UniversityDegreeRow,
 } from "@/types/application-form";
-import { PROGRAMME_CATEGORIES, PROGRAMME_LEVEL_LABELS } from "@/lib/college-programmes";
+import { PROGRAMME_CATEGORIES } from "@/lib/college-programmes";
+import { normalizeProgrammeLevels } from "@/lib/application-form/migrate-form-data";
 import {
   CheckboxOption,
   Field,
   inputClass,
+  selectClass,
   RadioOption,
   SectionTitle,
 } from "@/components/student/application/form-ui";
@@ -406,9 +408,12 @@ export function EnrolmentSection({
     value: EnrolmentInformation[K]
   ) => onChange({ ...data, [key]: value });
 
+  const update = (patch: Partial<EnrolmentInformation>) =>
+    onChange({ ...data, ...patch });
+
   const catalogue = PROGRAMME_CATEGORIES.flatMap((c) => c.programmes);
-  const availableLevels = Array.from(new Set(catalogue.map((p) => p.level)));
-  const selectedLevel = (data.programmeLevels[0] ?? "") as ProgrammeLevelChoice | "";
+  const selectedLevel = (normalizeProgrammeLevels(data.programmeLevels)[0] ??
+    "") as ProgrammeLevelChoice | "";
 
   const courseOptions = selectedLevel
     ? Array.from(
@@ -436,16 +441,18 @@ export function EnrolmentSection({
           value={selectedLevel}
           onChange={(e) => {
             const next = (e.target.value ?? "") as ProgrammeLevelChoice | "";
-            set("programmeLevels", next ? [next] : []);
-            set("firstChoiceCourse", "");
-            set("secondChoiceCourse", "");
+            update({
+              programmeLevels: next ? [next] : [],
+              firstChoiceCourse: "",
+              secondChoiceCourse: "",
+            });
           }}
           className={inputClass}
         >
           <option value="">Select a program</option>
-          {availableLevels.map((level) => (
-            <option key={level} value={level}>
-              {PROGRAMME_LEVEL_LABELS[level]}
+          {PROGRAMME_LEVEL_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>

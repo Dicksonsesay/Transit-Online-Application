@@ -4,7 +4,7 @@ export default function AdminLoginLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-full max-h-full w-full items-center justify-center overflow-hidden py-2">
+    <div className="flex w-full justify-center py-2">
       {children}
     </div>
   );

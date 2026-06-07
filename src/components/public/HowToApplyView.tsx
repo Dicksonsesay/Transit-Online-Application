@@ -10,6 +10,7 @@ import {
   FiMail,
   FiUserPlus,
 } from "react-icons/fi";
+import PublicPageHero from "@/components/public/PublicPageHero";
 import { APPLICATION_SECTIONS } from "@/types/application-form";
 import { DEFAULT_ADMISSION_PIN_AMOUNT } from "@/lib/constants";
 import { cn, formatCurrency } from "@/lib/utils";
@@ -96,41 +97,31 @@ const documentTypes = [
 export default function HowToApplyView() {
   return (
     <div className="bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[var(--dark-blue)] via-[var(--hero-blue)] to-[var(--primary-blue)] px-4 py-14 sm:px-6 sm:py-16 lg:px-10">
-        <div
-          className="absolute -right-20 top-0 h-64 w-64 rounded-full bg-[var(--primary-yellow)]/20 blur-3xl"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-[1400px]">
+      <PublicPageHero
+        eyebrow={
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary-yellow)]">
             Admissions guide
           </p>
-          <h1 className="mt-2 max-w-2xl text-3xl font-bold text-white sm:text-4xl">
-            How to apply online
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg">
-            Follow these steps to move from bank payment and PIN collection to a submitted
-            application on the Transit College Online Admission Portal—secure,
-            PIN-based, and available 24/7.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/auth/verify-pin"
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--primary-yellow)] px-6 py-3 text-sm font-semibold text-[var(--dark-blue)] transition-opacity hover:opacity-90"
-            >
-              Start with PIN verification
-              <FiArrowRight size={18} aria-hidden />
-            </Link>
-            <Link
-              href="/auth/login"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-white/90 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-            >
-              Already registered? Login
-            </Link>
-          </div>
+        }
+        title="How to apply online"
+        description="Follow these steps to move from bank payment and PIN collection to a submitted application on the Transit College Online Admission Portal—secure, PIN-based, and available 24/7."
+      >
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            href="/auth/verify-pin"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--primary-yellow)] px-6 py-3 text-sm font-semibold text-[var(--dark-blue)] transition-opacity hover:opacity-90"
+          >
+            Start with PIN verification
+            <FiArrowRight size={18} aria-hidden />
+          </Link>
+          <Link
+            href="/auth/login"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-white/90 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+          >
+            Already registered? Login
+          </Link>
         </div>
-      </section>
+      </PublicPageHero>
 
       {/* Main steps */}
       <section className="px-4 py-12 sm:px-6 sm:py-16 lg:px-10">

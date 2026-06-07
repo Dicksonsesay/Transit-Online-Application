@@ -5,8 +5,9 @@ export const COLLEGE_CONTACT = {
   email: "admission.transit@gmail.com",
   emailDisplay: "admission.transit@gmail.com",
   whatsappNumber: "23272197975",
-  officeHours: "Monday – Friday, 9:00 AM – 5:00 PM",
+  officeHours: "Monday – Friday, 8:00 AM – 4:00 PM",
   campus: "Transit College Sierra Leone",
+  address: "1 Wonder Drive Old Pampana, Magburaka Tonkolili District",
   locationNote: "Visit the admissions office on campus during office hours for in-person support.",
 } as const;
 

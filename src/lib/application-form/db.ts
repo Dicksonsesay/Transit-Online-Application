@@ -109,7 +109,7 @@ export async function getStudentApplicationContext(studentId: number) {
     };
   } else if (student?.passportPhoto && formData.personal) {
     formData.personal.passportPhotoUrl =
-      formData.personal.passportPhotoUrl ?? student.passportPhoto;
+      formData.personal.passportPhotoUrl || student.passportPhoto;
   }
 
   const storedDocs = formData.documents ?? emptyDocuments();

@@ -12,6 +12,7 @@ import {
   FiPhone,
   FiSend,
 } from "react-icons/fi";
+import PublicPageHero from "@/components/public/PublicPageHero";
 import {
   COLLEGE_CONTACT,
   collegeEmailUrl,
@@ -119,25 +120,16 @@ export default function ContactView() {
 
   return (
     <div className="bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[var(--dark-blue)] via-[var(--hero-blue)] to-[var(--primary-blue)] px-4 py-14 sm:px-6 sm:py-16 lg:px-10">
-        <div
-          className="absolute -left-16 top-1/3 h-56 w-56 rounded-full bg-[var(--primary-yellow)]/20 blur-3xl"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-[1400px]">
+      <PublicPageHero
+        blobPosition="left"
+        eyebrow={
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary-yellow)]">
             Get in touch
           </p>
-          <h1 className="mt-3 max-w-2xl text-3xl font-bold text-white sm:text-4xl">
-            Contact admissions
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg">
-            The admissions team at Transit College Sierra Leone is ready to help with
-            PINs, applications, programmes, and general admission enquiries.
-          </p>
-        </div>
-      </section>
+        }
+        title="Contact admissions"
+        description="The admissions team at Transit College Sierra Leone is ready to help with PINs, applications, programmes, and general admission enquiries."
+      />
 
       {/* Contact channels */}
       <section className="px-4 py-12 sm:px-6 sm:py-16 lg:px-10">
@@ -212,7 +204,10 @@ export default function ContactView() {
                   <p className="text-sm font-semibold text-zinc-800">
                     {COLLEGE_CONTACT.campus}
                   </p>
-                  <p className="mt-1 text-sm text-zinc-600">
+                  <p className="mt-1 text-sm leading-relaxed text-zinc-600">
+                    {COLLEGE_CONTACT.address}
+                  </p>
+                  <p className="mt-2 text-sm text-zinc-600">
                     {COLLEGE_CONTACT.locationNote}
                   </p>
                 </div>

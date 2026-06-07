@@ -113,10 +113,11 @@ model Student {
   dateOfBirth       DateTime?            @map("date_of_birth") @db.Date
   email             String               @unique @db.VarChar(150)
   phone             String?              @db.VarChar(20)
-  password          String               @db.VarChar(255)
+  password          String?              @db.VarChar(255)
+  googleId          String?              @unique @map("google_id") @db.VarChar(100)
   address           String?              @db.Text
   nationality       String?              @db.VarChar(100)
-  passportPhoto     String?              @map("passport_photo") @db.VarChar(255)
+  passportPhoto     String?              @map("passport_photo") @db.Text
   pinId             Int?                 @unique @map("pin_id")
   accountStatus     StudentAccountStatus @default(pending) @map("account_status")
   createdAt         DateTime             @default(now()) @map("created_at")
@@ -217,7 +218,7 @@ model UploadedDocument {
   id           Int      @id @default(autoincrement())
   studentId    Int      @map("student_id")
   documentType String   @map("document_type") @db.VarChar(100)
-  filePath     String   @map("file_path") @db.VarChar(255)
+  filePath     String   @map("file_path") @db.Text
   uploadedAt   DateTime @default(now()) @map("uploaded_at")
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)

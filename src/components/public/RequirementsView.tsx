@@ -5,6 +5,7 @@ import {
   FiExternalLink,
   FiInfo,
 } from "react-icons/fi";
+import PublicPageHero from "@/components/public/PublicPageHero";
 import {
   APPLICATION_NOTES,
   GENERAL_ELIGIBILITY,
@@ -21,41 +22,32 @@ export default function RequirementsView() {
 
   return (
     <div className="bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[var(--dark-blue)] via-[var(--hero-blue)] to-[var(--primary-blue)] px-4 py-14 sm:px-6 sm:py-16 lg:px-10">
-        <div
-          className="absolute -left-16 top-1/3 h-56 w-56 rounded-full bg-[var(--primary-yellow)]/20 blur-3xl"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-[1400px]">
+      <PublicPageHero
+        blobPosition="left"
+        eyebrow={
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary-yellow)]">
             Entry criteria
           </p>
-          <h1 className="mt-2 max-w-3xl text-3xl font-bold text-white sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
-            Admission requirements
-          </h1>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/90 sm:text-lg">
-            Review the academic qualifications, documents, and eligibility criteria for
-            degree programmes affiliated with Njala University and TEVET/NCTVA-accredited
-            pathways at Transit College Sierra Leone before you apply.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/how-to-apply"
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--primary-yellow)] px-6 py-3 text-sm font-semibold text-[var(--dark-blue)] transition-opacity hover:opacity-90"
-            >
-              How to apply
-              <FiArrowRight size={18} aria-hidden />
-            </Link>
-            <Link
-              href="/programs"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-white/90 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-            >
-              View programmes
-            </Link>
-          </div>
+        }
+        title="Admission requirements"
+        description="Review the academic qualifications, documents, and eligibility criteria for degree programmes affiliated with Njala University and TEVET/NCTVA-accredited pathways at Transit College Sierra Leone before you apply."
+      >
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            href="/how-to-apply"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--primary-yellow)] px-6 py-3 text-sm font-semibold text-[var(--dark-blue)] transition-opacity hover:opacity-90"
+          >
+            How to apply
+            <FiArrowRight size={18} aria-hidden />
+          </Link>
+          <Link
+            href="/programs"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-white/90 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+          >
+            View programmes
+          </Link>
         </div>
-      </section>
+      </PublicPageHero>
 
       {/* General eligibility */}
       <section className="border-b border-slate-200 bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-10">

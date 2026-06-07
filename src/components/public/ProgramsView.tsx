@@ -6,6 +6,7 @@ import {
   FiExternalLink,
   FiShield,
 } from "react-icons/fi";
+import PublicPageHero from "@/components/public/PublicPageHero";
 import {
   ALL_AFFILIATED_PROGRAMMES,
   ALL_COLLEGE_PROGRAMMES,
@@ -57,36 +58,26 @@ export default function ProgramsView() {
 
   return (
     <div className="bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[var(--dark-blue)] via-[var(--hero-blue)] to-[var(--primary-blue)] px-4 py-14 sm:px-6 sm:py-16 lg:px-10">
-        <div
-          className="absolute -left-16 top-1/3 h-56 w-56 rounded-full bg-[var(--primary-yellow)]/20 blur-3xl"
-          aria-hidden
-        />
-        <div
-          className="absolute -right-10 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-2xl"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-[1400px]">
+      <PublicPageHero
+        blobPosition="both"
+        eyebrow={
           <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--primary-yellow)] ring-1 ring-white/25">
             <FiAward size={14} aria-hidden />
             Njala University &amp; TEVET/NCTVA
           </div>
+        }
+        title={
           <h1 className="mt-4 max-w-3xl text-3xl font-bold text-white sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
             Programmes offered at Transit College
           </h1>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/90 sm:text-lg">
-            Transit College Sierra Leone offers degree programmes affiliated with Njala
-            University, and Higher National Diplomas, Diplomas, Teacher Certificates,
-            Higher Teacher Certificates, and other certificate programmes accredited
-            with TEVET/NCTVA.
-          </p>
-          <p className="mt-3 text-sm font-medium text-[var(--primary-yellow)]">
-            {njalaCount} degree programmes and {tevetCount} TEVET/NCTVA pathways across{" "}
-            {categoryCount} areas of study
-          </p>
-        </div>
-      </section>
+        }
+        description="Transit College Sierra Leone offers degree programmes affiliated with Njala University, and Higher National Diplomas, Diplomas, Teacher Certificates, Higher Teacher Certificates, and other certificate programmes accredited with TEVET/NCTVA."
+      >
+        <p className="mt-3 text-sm font-medium text-[var(--primary-yellow)]">
+          {njalaCount} degree programmes and {tevetCount} TEVET/NCTVA pathways across{" "}
+          {categoryCount} areas of study
+        </p>
+      </PublicPageHero>
 
       {/* Affiliation notices */}
       <section className="border-b border-slate-200 bg-white px-4 py-8 sm:px-6 lg:px-10">

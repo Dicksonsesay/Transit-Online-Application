@@ -2,6 +2,9 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { randomBytes } from "crypto";
 import { put } from "@vercel/blob";
+import { toStudentFileDisplayUrl } from "@/lib/student-file-url";
+
+export { toStudentFileDisplayUrl } from "@/lib/student-file-url";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8 MB
 
@@ -32,6 +35,17 @@ export function resolvePublicFileUrl(
   if (/^https?:\/\//i.test(filePath)) return filePath;
   if (!baseOrigin) return filePath;
   return `${baseOrigin}${filePath.startsWith("/") ? filePath : `/${filePath}`}`;
+}
+
+export function studentOwnsStoredFile(
+  studentId: number,
+  storedPath: string
+): boolean {
+  const marker = `students/${studentId}/`;
+  return (
+    storedPath.includes(marker) ||
+    storedPath.includes(`/uploads/students/${studentId}/`)
+  );
 }
 
 export function validateUploadFile(
