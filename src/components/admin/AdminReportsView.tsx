@@ -13,7 +13,6 @@ import {
   FiUsers,
   FiXCircle,
 } from "react-icons/fi";
-import AdminExportToolbar from "@/components/admin/AdminExportToolbar";
 import AdminCharts from "@/components/admin/charts/AdminCharts";
 import AdminReportExportToolbar from "@/components/admin/AdminReportExportToolbar";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
@@ -97,36 +96,125 @@ const metricCards: {
   },
 ];
 
+const reportHighlights: {
+  label: string;
+  getValue: (report: AdminReportsData) => string | number;
+  helper: (report: AdminReportsData) => string;
+  icon: IconType;
+}[] = [
+  {
+    label: "Total Applications",
+    getValue: (report) => report.totals.applications,
+    helper: (report) => `${report.totals.inReview} currently in review`,
+    icon: FiUsers,
+  },
+  {
+    label: "Acceptance Rate",
+    getValue: (report) => `${report.conversion.acceptanceRate}%`,
+    helper: (report) => `${report.totals.accepted} students accepted`,
+    icon: FiCheckCircle,
+  },
+  {
+    label: "PINs Issued",
+    getValue: (report) => report.totals.pinsIssued,
+    helper: (report) => `${report.pinRevenue.usedCount} redeemed · ${report.pinRevenue.unusedCount} unused`,
+    icon: FiKey,
+  },
+  {
+    label: "PIN Revenue",
+    getValue: (report) => formatCurrency(report.pinRevenue.totalAmount),
+    helper: (report) => `${formatCurrency(report.pinRevenue.usedAmount)} collected`,
+    icon: FiDollarSign,
+  },
+];
+
 export default function AdminReportsView({ report }: AdminReportsViewProps) {
   const maxMonthCount = Math.max(...report.monthlyApplications.map((m) => m.count), 1);
 
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:p-6">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#003e91] via-[#1f5fb8] to-[#f1c40f]" />
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-[var(--primary-blue)]">Admissions Report</h2>
-            <p className="mt-1 max-w-2xl text-sm text-zinc-500">
-              Operational snapshot for applications, interviews, PIN issuance, and
-              offers of admission.
-            </p>
-            <p className="mt-2 text-xs text-zinc-400">
-              Generated: {formatDate(report.generatedAt)}
-            </p>
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#001a45] via-[var(--dark-blue)] to-[var(--hero-blue)] p-5 shadow-[0_18px_40px_-14px_rgba(0,31,84,0.45)] sm:p-6 lg:p-8">
+        <div
+          className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-[var(--primary-yellow)]/20 blur-2xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -bottom-14 -left-10 h-44 w-44 rounded-full bg-white/10 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute right-1/4 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[var(--primary-yellow)]/10 blur-xl"
+          aria-hidden
+        />
+
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start gap-4">
+              <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-white shadow-inner ring-2 ring-white/20 backdrop-blur-sm">
+                <FiFileText size={22} aria-hidden />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--primary-yellow)] sm:text-xs">
+                  Admin Reports
+                </p>
+                <h2 className="mt-1 text-xl font-bold leading-tight text-white sm:text-2xl">
+                  Admissions Report
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/70">
+                  Operational snapshot for applications, interviews, PIN issuance, offers of
+                  admission, and conversion performance across the admission cycle.
+                </p>
+                <p className="mt-3 text-xs font-medium text-white/50">
+                  Generated {formatDate(report.generatedAt)}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col items-start gap-3 sm:items-end">
-            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-blue)] text-white shadow-md">
-              <FiFileText size={16} aria-hidden />
-            </span>
+
+          <div className="shrink-0 self-start rounded-xl bg-white/10 p-3 ring-1 ring-white/15 backdrop-blur-sm">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/55">
+              Download report
+            </p>
             <AdminReportExportToolbar />
           </div>
         </div>
+
+        <div className="relative mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {reportHighlights.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.label}
+                className="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-white/55">
+                      {item.label}
+                    </p>
+                    <p className="mt-1.5 text-2xl font-bold text-[var(--primary-yellow)]">
+                      {item.getValue(report)}
+                    </p>
+                    <p className="mt-1 text-xs text-white/60">{item.helper(report)}</p>
+                  </div>
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white/90">
+                    <Icon size={16} aria-hidden />
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-[var(--primary-yellow)] to-transparent"
+          aria-hidden
+        />
       </section>
 
       <AdminCharts report={report} />
 
-      <section className="grid gap-4 lg:grid-cols-2">
+      <section>
         <article className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-yellow-50 p-5 shadow-sm">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -170,57 +258,6 @@ export default function AdminReportsView({ report }: AdminReportsViewProps) {
                   {formatCurrency(item.amount)}
                 </p>
                 <p className="text-xs text-zinc-500">{item.detail}</p>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="text-base font-bold text-[var(--primary-blue)]">
-                Quick Register Exports
-              </h3>
-              <p className="mt-1 text-sm text-zinc-500">
-                Download printable registers for PINs, applicants, interviews, and accepted students.
-              </p>
-            </div>
-            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-blue)] text-white shadow-md">
-              <FiFileText size={16} aria-hidden />
-            </span>
-          </div>
-          <div className="mt-4 space-y-3">
-            {[
-              {
-                title: "PIN register",
-                description: "All PINs with receipt numbers, student usage, and totals",
-                path: "/api/admin/pins/export",
-              },
-              {
-                title: "All applicants",
-                description: "Full applicant list with programme and status",
-                path: "/api/admin/applicants/export",
-              },
-              {
-                title: "Interview register",
-                description: "Scheduled and completed interviews",
-                path: "/api/admin/interviews/export",
-              },
-              {
-                title: "Accepted students",
-                description: "Admitted students and offer letter status",
-                path: "/api/admin/offer-admission/export",
-              },
-            ].map((item) => (
-              <div
-                key={item.path}
-                className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-slate-50/70 p-3 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-zinc-800">{item.title}</p>
-                  <p className="text-xs text-zinc-500">{item.description}</p>
-                </div>
-                <AdminExportToolbar compact basePath={item.path} showPrint={false} />
               </div>
             ))}
           </div>

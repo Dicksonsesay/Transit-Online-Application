@@ -23,11 +23,21 @@ export const pdfBaseStyles = StyleSheet.create({
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 16,
     paddingBottom: 12,
     borderBottomWidth: 2,
     borderBottomColor: PDF_COLORS.primary,
+  },
+  headerLeft: {
+    flex: 1,
+    maxWidth: "58%",
+    paddingRight: 12,
+  },
+  headerRight: {
+    flexShrink: 0,
+    maxWidth: "40%",
+    alignItems: "flex-end",
   },
   logo: {
     width: 52,

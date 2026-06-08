@@ -1,5 +1,6 @@
 import {
   Document,
+  Image,
   Page,
   StyleSheet,
   Text,
@@ -32,6 +33,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     letterSpacing: 1,
+  },
+  institutionRow: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: "#f8fafc",
+    borderBottomWidth: 0.5,
+    borderBottomColor: PDF_COLORS.border,
+    alignItems: "center",
+  },
+  institutionName: {
+    fontSize: 11,
+    fontWeight: "bold",
+    color: PDF_COLORS.primary,
+    textAlign: "center",
   },
   receiptBody: {
     padding: 20,
@@ -86,8 +101,61 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
     color: PDF_COLORS.muted,
   },
+  portalSection: {
+    marginTop: 14,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
+    backgroundColor: "#f0f9ff",
+    borderWidth: 1,
+    borderColor: "#bae6fd",
+    borderRadius: 4,
+  },
+  portalInfo: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  portalLabel: {
+    fontSize: 8,
+    color: PDF_COLORS.muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    marginBottom: 4,
+  },
+  portalTitle: {
+    fontSize: 9,
+    fontWeight: "bold",
+    color: PDF_COLORS.text,
+    marginBottom: 4,
+  },
+  portalUrl: {
+    fontSize: 8,
+    color: PDF_COLORS.primary,
+    lineHeight: 1.4,
+  },
+  portalHint: {
+    marginTop: 6,
+    fontSize: 7,
+    color: PDF_COLORS.muted,
+    lineHeight: 1.4,
+  },
+  qrColumn: {
+    alignItems: "center",
+    flexShrink: 0,
+  },
+  qrImage: {
+    width: 72,
+    height: 72,
+  },
+  qrCaption: {
+    marginTop: 4,
+    fontSize: 7,
+    color: PDF_COLORS.muted,
+    textAlign: "center",
+  },
   stamp: {
-    marginTop: 18,
+    marginTop: 14,
     alignSelf: "flex-end",
     paddingVertical: 6,
     paddingHorizontal: 14,
@@ -117,6 +185,8 @@ type PinReceiptPDFDocumentProps = {
   collegeName: string;
   tagline?: string;
   logoSrc?: string;
+  portalUrl: string;
+  qrCodeSrc: string;
 };
 
 export default function PinReceiptPDFDocument({
@@ -124,6 +194,8 @@ export default function PinReceiptPDFDocument({
   collegeName,
   tagline,
   logoSrc,
+  portalUrl,
+  qrCodeSrc,
 }: PinReceiptPDFDocumentProps) {
   return (
     <Document>
@@ -139,6 +211,9 @@ export default function PinReceiptPDFDocument({
         <View style={styles.receiptCard}>
           <View style={styles.receiptBanner}>
             <Text style={styles.receiptBannerText}>Admission PIN Receipt</Text>
+          </View>
+          <View style={styles.institutionRow}>
+            <Text style={styles.institutionName}>{collegeName}</Text>
           </View>
           <View style={styles.receiptBody}>
             <View style={styles.detailRow}>
@@ -169,10 +244,26 @@ export default function PinReceiptPDFDocument({
             </View>
 
             <Text style={styles.note}>
-              This receipt confirms payment of the admission fee. The student should use the
-              PIN above at the Online Admission Portal (Verify PIN) to create their account
-              and complete their application. Keep this receipt for your records.
+              This receipt confirms payment of the admission fee. Use your PIN at the Online
+              Admission Portal to verify your payment, create your account, and complete your
+              application. Keep this receipt for your records.
             </Text>
+
+            <View style={styles.portalSection}>
+              <View style={styles.portalInfo}>
+                <Text style={styles.portalLabel}>Online Admission Portal</Text>
+                <Text style={styles.portalTitle}>Verify PIN and Register</Text>
+                <Text style={styles.portalUrl}>{portalUrl}</Text>
+                <Text style={styles.portalHint}>
+                  Visit the link above or scan the QR code to open the portal and enter your
+                  admission PIN.
+                </Text>
+              </View>
+              <View style={styles.qrColumn}>
+                <Image src={qrCodeSrc} style={styles.qrImage} />
+                <Text style={styles.qrCaption}>Scan to open portal</Text>
+              </View>
+            </View>
 
             <View style={styles.stamp}>
               <Text style={styles.stampText}>Official Receipt</Text>

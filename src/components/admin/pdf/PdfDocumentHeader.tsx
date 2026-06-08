@@ -18,14 +18,16 @@ export default function PdfDocumentHeader({
 }: PdfDocumentHeaderProps) {
   return (
     <View style={pdfBaseStyles.headerRow}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        {logoSrc ? <Image src={logoSrc} style={pdfBaseStyles.logo} /> : null}
-        <View>
-          <Text style={pdfBaseStyles.collegeName}>{collegeName}</Text>
-          <Text style={pdfBaseStyles.collegeTagline}>{tagline}</Text>
+      <View style={pdfBaseStyles.headerLeft}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          {logoSrc ? <Image src={logoSrc} style={pdfBaseStyles.logo} /> : null}
+          <View style={{ flex: 1 }}>
+            <Text style={pdfBaseStyles.collegeName}>{collegeName}</Text>
+            <Text style={pdfBaseStyles.collegeTagline}>{tagline}</Text>
+          </View>
         </View>
       </View>
-      <View>
+      <View style={pdfBaseStyles.headerRight}>
         <Text style={pdfBaseStyles.docTitle}>{title}</Text>
         {subtitle ? <Text style={pdfBaseStyles.docMeta}>{subtitle}</Text> : null}
       </View>
