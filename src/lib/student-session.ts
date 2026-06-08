@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import type { NextResponse } from "next/server";
 import { encode } from "next-auth/jwt";
 
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60;
@@ -9,7 +10,17 @@ export function getSessionCookieName() {
     : "next-auth.session-token";
 }
 
-export async function setStudentSessionCookie(student: {
+export function getStudentSessionCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: SESSION_MAX_AGE,
+  };
+}
+
+export async function encodeStudentSessionToken(student: {
   id: number;
   fullname: string;
   email: string;
@@ -19,7 +30,7 @@ export async function setStudentSessionCookie(student: {
     throw new Error("NEXTAUTH_SECRET is not set");
   }
 
-  const token = await encode({
+  return encode({
     token: {
       sub: String(student.id),
       id: String(student.id),
@@ -30,13 +41,30 @@ export async function setStudentSessionCookie(student: {
     secret,
     maxAge: SESSION_MAX_AGE,
   });
+}
 
+export async function appendStudentSessionCookie(
+  response: NextResponse,
+  student: { id: number; fullname: string; email: string }
+) {
+  const token = await encodeStudentSessionToken(student);
+  response.cookies.set(
+    getSessionCookieName(),
+    token,
+    getStudentSessionCookieOptions()
+  );
+}
+
+export async function setStudentSessionCookie(student: {
+  id: number;
+  fullname: string;
+  email: string;
+}) {
+  const token = await encodeStudentSessionToken(student);
   const cookieStore = await cookies();
-  cookieStore.set(getSessionCookieName(), token, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: SESSION_MAX_AGE,
-  });
+  cookieStore.set(
+    getSessionCookieName(),
+    token,
+    getStudentSessionCookieOptions()
+  );
 }
