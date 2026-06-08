@@ -1,4 +1,5 @@
 export const VERIFIED_PIN_COOKIE = "verified_pin_id";
+export const REGISTER_EMAIL_COOKIE = "register_email_verification";
 export const GOOGLE_REGISTER_COOKIE = "google_register_profile";
 export const GOOGLE_LOGIN_PIN_COOKIE = "google_login_student_id";
 

@@ -262,9 +262,12 @@ export default function PinManagement({ pins, stats, revenue }: PinManagementPro
                 id="receiptNumber"
                 name="receiptNumber"
                 type="text"
-                placeholder="Bank receipt number"
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
+                placeholder="Unique bank receipt number"
+                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm uppercase outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
               />
+              <p className="mt-1 text-[11px] text-zinc-500">
+                Each receipt number can only be used once in the system.
+              </p>
             </div>
             <button
               type="submit"

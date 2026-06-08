@@ -90,7 +90,7 @@ model Admin {
 model Pin {
   id             Int       @id @default(autoincrement())
   pinCode        String    @unique @map("pin_code") @db.VarChar(50)
-  receiptNumber  String?   @map("receipt_number") @db.VarChar(100)
+  receiptNumber  String?   @unique @map("receipt_number") @db.VarChar(100)
   amount         Decimal   @db.Decimal(10, 2)
   status         PinStatus @default(unused)
   generatedById  Int       @map("generated_by")

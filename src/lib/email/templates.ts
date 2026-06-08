@@ -222,3 +222,62 @@ export function buildGoogleVerificationEmail(input: {
 
   return { subject, html, text };
 }
+
+export function buildRegisterEmailVerificationEmail(input: {
+  studentName: string;
+  verificationCode: string;
+}): { subject: string; html: string; text: string } {
+  const { collegeName } = getEmailConfig();
+  const safeName = escapeHtml(input.studentName);
+  const safeCode = escapeHtml(input.verificationCode);
+  const subject = `[${collegeName}] Verify your email for registration`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(subject)}</title>
+</head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0f172a;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f1f5f9;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
+          <tr>
+            <td style="background:linear-gradient(135deg,#0a3d7a,#1e5aa8);padding:24px 28px;">
+              <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#f4b400;">${escapeHtml(collegeName)}</p>
+              <h1 style="margin:8px 0 0;font-size:22px;line-height:1.3;color:#ffffff;">Verify your email address</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px;">
+              <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#334155;">Dear ${safeName},</p>
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#334155;">
+                You are creating a student account on the Online Admission Portal. Enter this verification code on the registration page to confirm that this is a real, registered email address you can access.
+              </p>
+              <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#64748b;">Verification code</p>
+              <p style="margin:0 0 20px;font-size:32px;font-weight:800;letter-spacing:0.3em;color:#0a3d7a;">${safeCode}</p>
+              <p style="margin:0;font-size:12px;line-height:1.6;color:#64748b;">
+                This code expires in 15 minutes. If you did not request this, you can ignore this email.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 28px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+              <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">
+                Transformation For Excellence · ${escapeHtml(collegeName)}
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const text = `${collegeName}\n\nVerify your email\n\nDear ${input.studentName},\n\nYour verification code is: ${input.verificationCode}\n\nThis code expires in 15 minutes.\n`;
+
+  return { subject, html, text };
+}

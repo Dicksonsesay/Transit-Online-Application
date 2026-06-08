@@ -3,9 +3,16 @@ import { redirect } from "next/navigation";
 import RegisterForm, {
   type GoogleRegisterProfile,
 } from "@/components/auth/RegisterForm";
-import { GOOGLE_REGISTER_COOKIE, VERIFIED_PIN_COOKIE } from "@/lib/constants";
+import {
+  GOOGLE_REGISTER_COOKIE,
+  REGISTER_EMAIL_COOKIE,
+  VERIFIED_PIN_COOKIE,
+} from "@/lib/constants";
 import { isGoogleOAuthEnabled } from "@/lib/google-oauth-config";
-import { parseGoogleRegisterSession } from "@/lib/google-verification";
+import {
+  parseGoogleRegisterSession,
+  parseRegisterEmailSession,
+} from "@/lib/email-verification";
 
 export const metadata = {
   title: "Create Account | Transit College",
@@ -28,11 +35,26 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
   const googleSession = parseGoogleRegisterSession(
     cookieStore.get(GOOGLE_REGISTER_COOKIE)?.value
   );
+  const registerEmailSession = parseRegisterEmailSession(
+    cookieStore.get(REGISTER_EMAIL_COOKIE)?.value
+  );
+
   const googleProfile: GoogleRegisterProfile | undefined = googleSession
     ? { email: googleSession.email, fullname: googleSession.fullname }
     : undefined;
   const googleEnabled = isGoogleOAuthEnabled();
   const googleEmailVerified = Boolean(googleSession?.verified);
+  const manualEmailVerified = Boolean(registerEmailSession?.verified);
+  const manualRegisterProfile = registerEmailSession
+    ? {
+        email: registerEmailSession.email,
+        fullname: registerEmailSession.fullname,
+      }
+    : undefined;
+  const registerEmailPending =
+    registerEmailSession && !registerEmailSession.verified
+      ? manualRegisterProfile
+      : undefined;
   const showGoogleVerificationNotice = from === "google" && googleSession && !googleEmailVerified;
 
   return (
@@ -40,6 +62,9 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
       googleEnabled={googleEnabled}
       googleProfile={googleProfile}
       googleEmailVerified={googleEmailVerified}
+      manualEmailVerified={manualEmailVerified}
+      manualRegisterProfile={manualRegisterProfile}
+      registerEmailPending={registerEmailPending}
       showGoogleVerificationNotice={showGoogleVerificationNotice}
       initialError={error ? decodeURIComponent(error) : undefined}
     />

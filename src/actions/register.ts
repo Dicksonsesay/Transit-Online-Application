@@ -6,14 +6,25 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { GOOGLE_REGISTER_COOKIE, VERIFIED_PIN_COOKIE } from "@/lib/constants";
+import {
+  GOOGLE_REGISTER_COOKIE,
+  REGISTER_EMAIL_COOKIE,
+  VERIFIED_PIN_COOKIE,
+} from "@/lib/constants";
+import { validateRegistrationEmail } from "@/lib/email-validation";
+import { isEmailVerificationCodeValid } from "@/lib/email-verification";
 import {
   markGoogleRegisterSessionVerified,
   readGoogleRegisterSession,
   refreshGoogleRegisterVerificationCode,
 } from "@/lib/google-register-session";
 import { registerStudentWithGoogle } from "@/lib/google-student-auth";
-import { isGoogleVerificationCodeValid } from "@/lib/google-verification";
+import {
+  issueRegisterEmailVerification,
+  markRegisterEmailSessionVerified,
+  readRegisterEmailSession,
+  refreshRegisterEmailVerificationCode,
+} from "@/lib/register-email-session";
 import { PinStatus, StudentAccountStatus } from "@/generated/prisma/client";
 import { setStudentSessionCookie } from "@/lib/student-session";
 
@@ -53,8 +64,27 @@ export async function registerStudent(
     return { success: false, error: "Please enter your full name." };
   }
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { success: false, error: "Please enter a valid email address." };
+  const emailValidation = await validateRegistrationEmail(email);
+  if (!emailValidation.ok) {
+    return { success: false, error: emailValidation.error };
+  }
+
+  const normalizedEmail = emailValidation.normalized;
+
+  const emailSession = await readRegisterEmailSession();
+  if (!emailSession?.verified || emailSession.email !== normalizedEmail) {
+    return {
+      success: false,
+      error:
+        "Verify your email address with the code sent to your inbox before creating your account.",
+    };
+  }
+
+  if (emailSession.fullname.trim().toLowerCase() !== fullname.trim().toLowerCase()) {
+    return {
+      success: false,
+      error: "Your name must match the details used when the verification code was sent.",
+    };
   }
 
   if (!password || password.length < 8) {
@@ -96,7 +126,7 @@ export async function registerStudent(
   }
 
   const existingEmail = await prisma.student.findUnique({
-    where: { email },
+    where: { email: normalizedEmail },
     select: { id: true },
   });
 
@@ -114,7 +144,7 @@ export async function registerStudent(
       const created = await tx.student.create({
         data: {
           fullname,
-          email,
+          email: normalizedEmail,
           password: hashedPassword,
           pinId: pin.id,
           accountStatus: StudentAccountStatus.active,
@@ -139,6 +169,7 @@ export async function registerStudent(
     });
 
     cookieStore.delete(VERIFIED_PIN_COOKIE);
+    cookieStore.delete(REGISTER_EMAIL_COOKIE);
 
     return { success: true, email: student.email, pinCode: pin.pinCode };
   } catch {
@@ -173,7 +204,7 @@ export async function verifyGoogleEmailCodeAction(
     };
   }
 
-  if (!isGoogleVerificationCodeValid(code, session.codeHash)) {
+  if (!isEmailVerificationCodeValid(code, session.codeHash)) {
     return { error: "Invalid verification code. Check your email and try again." };
   }
 
@@ -181,6 +212,114 @@ export async function verifyGoogleEmailCodeAction(
   revalidatePath("/auth/register");
   return {
     success: "Google email verified. You can now create your student account.",
+  };
+}
+
+export async function sendRegisterEmailCodeAction(
+  _prevState: GoogleVerifyFormState,
+  formData: FormData
+): Promise<GoogleVerifyFormState> {
+  const fullname = formData.get("fullname")?.toString().trim() ?? "";
+  const emailRaw = formData.get("email")?.toString() ?? "";
+
+  if (!fullname || fullname.length < 2) {
+    return { error: "Enter your full name before requesting a verification code." };
+  }
+
+  const emailValidation = await validateRegistrationEmail(emailRaw);
+  if (!emailValidation.ok) {
+    return { error: emailValidation.error };
+  }
+
+  const cookieStore = await cookies();
+  const verifiedPin = cookieStore.get(VERIFIED_PIN_COOKIE);
+  if (!verifiedPin?.value) {
+    return { error: "Please verify your admission PIN before registering." };
+  }
+
+  const existingEmail = await prisma.student.findUnique({
+    where: { email: emailValidation.normalized },
+    select: { id: true },
+  });
+
+  if (existingEmail) {
+    return {
+      error: "An account with this email already exists. Please log in instead.",
+    };
+  }
+
+  cookieStore.delete(GOOGLE_REGISTER_COOKIE);
+
+  const issued = await issueRegisterEmailVerification({
+    email: emailValidation.normalized,
+    fullname,
+  });
+
+  if (!issued.ok) {
+    return { error: issued.error };
+  }
+
+  revalidatePath("/auth/register");
+  return {
+    success: `A verification code has been sent to ${emailValidation.normalized}.`,
+  };
+}
+
+export async function verifyRegisterEmailCodeAction(
+  _prevState: GoogleVerifyFormState,
+  formData: FormData
+): Promise<GoogleVerifyFormState> {
+  const rawCode = formData.get("verificationCode")?.toString() ?? "";
+  const code = rawCode.replace(/\D/g, "");
+  const session = await readRegisterEmailSession();
+
+  if (!session) {
+    return {
+      error: "Email verification expired. Request a new verification code.",
+    };
+  }
+
+  if (session.verified) {
+    return { success: "Your email is already verified. You can create your account." };
+  }
+
+  if (Date.now() > session.expiresAt) {
+    return {
+      error: "This verification code has expired. Click “Resend code” to get a new one.",
+    };
+  }
+
+  if (!isEmailVerificationCodeValid(code, session.codeHash)) {
+    return { error: "Invalid verification code. Check your email and try again." };
+  }
+
+  await markRegisterEmailSessionVerified(session);
+  revalidatePath("/auth/register");
+  return {
+    success: "Email verified. You can now create your student account.",
+  };
+}
+
+export async function resendRegisterEmailCodeAction(): Promise<GoogleVerifyFormState> {
+  const session = await readRegisterEmailSession();
+
+  if (!session) {
+    return {
+      error: "Email verification expired. Request a new verification code.",
+    };
+  }
+
+  if (session.verified) {
+    return { success: "Your email is already verified." };
+  }
+
+  const result = await refreshRegisterEmailVerificationCode(session);
+  if (!result.ok) {
+    return { error: result.error };
+  }
+
+  return {
+    success: `A new verification code has been sent to ${session.email}.`,
   };
 }
 
@@ -269,6 +408,7 @@ export async function registerWithGoogleAction(
 export async function clearGoogleRegisterAction(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(GOOGLE_REGISTER_COOKIE);
+  cookieStore.delete(REGISTER_EMAIL_COOKIE);
   redirect("/auth/register");
 }
 
@@ -300,6 +440,7 @@ export async function registerStudentAction(
   }
 
   try {
+    const cookieStore = await cookies();
     const student = await prisma.student.findFirst({
       where: { email: result.email },
       select: { id: true, fullname: true, email: true },
@@ -309,6 +450,7 @@ export async function registerStudentAction(
       return { error: "Account created but session failed. Please log in." };
     }
 
+    cookieStore.delete(REGISTER_EMAIL_COOKIE);
     await setStudentSessionCookie(student);
     redirect("/student");
   } catch (error) {

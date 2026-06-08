@@ -2,26 +2,26 @@
 
 import EmailVerificationCodeForm from "@/components/auth/EmailVerificationCodeForm";
 import {
-  resendGoogleVerificationCodeAction,
-  verifyGoogleEmailCodeAction,
+  resendRegisterEmailCodeAction,
+  verifyRegisterEmailCodeAction,
 } from "@/actions/register";
 
-type GoogleEmailVerificationFormProps = {
+type RegisterEmailVerificationFormProps = {
   email: string;
   onVerified?: () => void;
 };
 
-export default function GoogleEmailVerificationForm({
+export default function RegisterEmailVerificationForm({
   email,
   onVerified,
-}: GoogleEmailVerificationFormProps) {
+}: RegisterEmailVerificationFormProps) {
   return (
     <EmailVerificationCodeForm
       email={email}
-      title="Verify your Google email"
+      title="Verify your email address"
       description="We sent a 6-digit code to"
-      verifyAction={verifyGoogleEmailCodeAction}
-      resendAction={resendGoogleVerificationCodeAction}
+      verifyAction={verifyRegisterEmailCodeAction}
+      resendAction={resendRegisterEmailCodeAction}
       onVerified={onVerified}
     />
   );

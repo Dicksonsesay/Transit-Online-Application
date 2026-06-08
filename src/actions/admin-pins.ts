@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { DEFAULT_ADMISSION_PIN_AMOUNT } from "@/lib/constants";
 import { getDefaultPinAmountFromSettings } from "@/lib/system-settings";
 import { generateUniquePinCode } from "@/lib/pin-generate";
+import {
+  buildAutoReceiptNumber,
+  isReceiptNumberTaken,
+  normalizeReceiptNumber,
+} from "@/lib/pin-receipt";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/session";
 import { PinStatus } from "@/generated/prisma/client";
@@ -17,6 +22,15 @@ export type GeneratePinState = {
 function parseAdminId(sessionUserId: string | undefined): number | null {
   const id = Number.parseInt(sessionUserId ?? "", 10);
   return Number.isNaN(id) ? null : id;
+}
+
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: string }).code === "P2002"
+  );
 }
 
 export async function generateAdmissionPinAction(
@@ -34,13 +48,20 @@ export async function generateAdmissionPinAction(
   }
 
   const amountRaw = formData.get("amount")?.toString().trim();
-  const receiptNumber = formData.get("receiptNumber")?.toString().trim() || null;
+  const receiptRaw = formData.get("receiptNumber")?.toString().trim() ?? "";
+  const normalizedReceipt = receiptRaw ? normalizeReceiptNumber(receiptRaw) : null;
 
   const defaultAmount = await getDefaultPinAmountFromSettings();
   const amount = amountRaw ? Number.parseFloat(amountRaw) : defaultAmount;
 
   if (!Number.isFinite(amount) || amount <= 0) {
     return { error: "Enter a valid payment amount greater than zero." };
+  }
+
+  if (normalizedReceipt && (await isReceiptNumberTaken(normalizedReceipt))) {
+    return {
+      error: "This receipt number is already registered. Each bank receipt must be unique.",
+    };
   }
 
   try {
@@ -50,26 +71,27 @@ export async function generateAdmissionPinAction(
       data: {
         pinCode,
         amount,
-        receiptNumber,
+        receiptNumber: normalizedReceipt,
         generatedById: adminId,
         status: PinStatus.unused,
       },
     });
 
-    const year = new Date().getFullYear();
-    const finalReceiptNumber =
-      receiptNumber ?? `RCP-${year}-${String(pin.id).padStart(5, "0")}`;
-
-    if (!receiptNumber) {
+    if (!normalizedReceipt) {
       await prisma.pin.update({
         where: { id: pin.id },
-        data: { receiptNumber: finalReceiptNumber },
+        data: { receiptNumber: buildAutoReceiptNumber(pin.id, pin.createdAt) },
       });
     }
 
     revalidatePath("/admin/pins");
     return { pinCode, pinId: pin.id };
-  } catch {
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      return {
+        error: "This receipt number is already registered. Each bank receipt must be unique.",
+      };
+    }
     return { error: "Could not generate PIN. Please try again." };
   }
 }

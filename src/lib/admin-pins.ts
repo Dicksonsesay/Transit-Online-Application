@@ -1,3 +1,4 @@
+import { buildAutoReceiptNumber } from "@/lib/pin-receipt";
 import { prisma } from "@/lib/prisma";
 import type { PinStatus } from "@/generated/prisma/client";
 
@@ -11,8 +12,7 @@ export function formatPinReceiptNumber(pin: {
 
   const created =
     typeof pin.createdAt === "string" ? new Date(pin.createdAt) : pin.createdAt;
-  const year = created.getFullYear();
-  return `RCP-${year}-${String(pin.id).padStart(5, "0")}`;
+  return buildAutoReceiptNumber(pin.id, created);
 }
 
 export type PinListItem = {
