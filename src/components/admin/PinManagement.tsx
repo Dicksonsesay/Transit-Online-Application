@@ -233,105 +233,86 @@ export default function PinManagement({ pins, stats, revenue }: PinManagementPro
         </div>
       </section>
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm ring-1 ring-slate-900/5 sm:flex-row sm:items-center sm:justify-between">
-        <AdminFilterTabs
-          tabs={[
-            { key: "all" as const, label: "All", count: pins.length },
-            { key: "unused" as const, label: "Unused", count: stats.unused },
-            { key: "used" as const, label: "Used", count: stats.used },
-          ]}
-          value={filter}
-          onChange={setFilter}
-        />
-        <div className="flex flex-wrap gap-2">
-          <form action={generateAction}>
-            <input type="hidden" name="amount" value={DEFAULT_ADMISSION_PIN_AMOUNT} />
-            <button
-              type="submit"
-              disabled={generating}
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--hero-blue)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 disabled:opacity-60"
-            >
-              <FiPlus size={18} aria-hidden />
-              {generating ? "Generating…" : "Quick generate"}
-            </button>
-          </form>
-          <AdminSecondaryButton onClick={() => setShowForm((v) => !v)}>
-            {showForm ? "Hide form" : "Payment details"}
-          </AdminSecondaryButton>
-        </div>
-      </div>
-
-      {showForm ? (
-        <form
-          action={generateAction}
-          className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm ring-1 ring-slate-900/5"
-        >
-          <div className="border-b border-slate-100 bg-gradient-to-r from-amber-50/80 to-white px-5 py-4 sm:px-6">
-            <h2 className="text-base font-bold text-[var(--primary-blue)]">
-              New admission PIN
-            </h2>
-            <p className="mt-1 text-sm text-zinc-500">
-              Optionally record receipt number and payment amount before generating.
-            </p>
-          </div>
-          <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-6">
-            <div>
-              <label htmlFor="receiptNumber" className="mb-1.5 block text-sm font-semibold text-zinc-700">
-                Receipt number (optional)
+      <form
+        action={generateAction}
+        className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm ring-1 ring-slate-900/5"
+      >
+        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
+          <AdminFilterTabs
+            tabs={[
+              { key: "all" as const, label: "All", count: pins.length },
+              { key: "unused" as const, label: "Unused", count: stats.unused },
+              { key: "used" as const, label: "Used", count: stats.used },
+            ]}
+            value={filter}
+            onChange={setFilter}
+          />
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-end">
+            {!showForm ? (
+              <input type="hidden" name="amount" value={DEFAULT_ADMISSION_PIN_AMOUNT} />
+            ) : null}
+            <div className="min-w-[12rem] flex-1 sm:min-w-[14rem]">
+              <label
+                htmlFor="receiptNumber"
+                className="mb-1 block text-xs font-semibold text-zinc-600"
+              >
+                Receipt No.
               </label>
               <input
                 id="receiptNumber"
                 name="receiptNumber"
                 type="text"
-                placeholder="e.g. RCP-2026-00421"
-                className="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
+                placeholder="Bank receipt number"
+                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
               />
             </div>
-            <div>
-              <label htmlFor="amount" className="mb-1.5 block text-sm font-semibold text-zinc-700">
-                Amount (SLE)
-              </label>
-              <input
-                id="amount"
-                name="amount"
-                type="number"
-                min="0.01"
-                step="0.01"
-                defaultValue={DEFAULT_ADMISSION_PIN_AMOUNT}
-                className="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
-              />
-            </div>
-          </div>
-          {generateState.error ? (
-            <p className="px-6 text-sm font-medium text-red-600" role="alert">
-              {generateState.error}
-            </p>
-          ) : null}
-          <div className="flex flex-wrap gap-3 border-t border-slate-100 bg-slate-50/50 px-5 py-4 sm:px-6">
             <button
               type="submit"
               disabled={generating}
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary-yellow)] px-5 py-2.5 text-sm font-bold text-[var(--dark-blue)] hover:opacity-95 disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--hero-blue)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 disabled:opacity-60"
             >
-              <FiPlus size={16} aria-hidden />
-              {generating ? "Generating…" : "Generate random PIN"}
+              <FiPlus size={18} aria-hidden />
+              {generating ? "Generating…" : "Generate PIN"}
             </button>
-            <AdminSecondaryButton type="button" onClick={() => setShowForm(false)}>
-              Cancel
+            <AdminSecondaryButton type="button" onClick={() => setShowForm((v) => !v)}>
+              {showForm ? "Hide amount" : "Custom amount"}
             </AdminSecondaryButton>
           </div>
-        </form>
-      ) : null}
+        </div>
+
+        {showForm ? (
+          <div className="border-t border-slate-100 bg-gradient-to-r from-amber-50/50 to-white px-5 py-4 sm:px-6">
+            <label htmlFor="amount" className="mb-1.5 block text-sm font-semibold text-zinc-700">
+              Amount (SLE)
+            </label>
+            <input
+              id="amount"
+              name="amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              defaultValue={DEFAULT_ADMISSION_PIN_AMOUNT}
+              className="max-w-xs rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
+            />
+          </div>
+        ) : null}
+
+        {generateState.error ? (
+          <p className="border-t border-slate-100 px-5 py-3 text-sm font-medium text-red-600" role="alert">
+            {generateState.error}
+          </p>
+        ) : null}
+      </form>
 
       <AdminTableShell
         title="PIN register"
-        subtitle="Copy PINs for students or remove unused entries"
+        subtitle="Receipt numbers, PIN codes, student usage, and payment amounts"
         countLabel={`${filteredPins.length} PIN${filteredPins.length === 1 ? "" : "s"}`}
       >
         <AdminTable>
           <AdminTableHead>
+            <AdminTh>Receipt No.</AdminTh>
             <AdminTh>PIN code</AdminTh>
-            <AdminTh>Receipt</AdminTh>
             <AdminTh>Amount</AdminTh>
             <AdminTh>Status</AdminTh>
             <AdminTh>Generated by</AdminTh>
@@ -351,12 +332,14 @@ export default function PinManagement({ pins, stats, revenue }: PinManagementPro
               filteredPins.map((pin) => (
                 <AdminTableRow key={pin.id} striped>
                   <AdminTd>
+                    <span className="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1.5 font-mono text-xs font-semibold text-zinc-700">
+                      {pin.receiptNumber}
+                    </span>
+                  </AdminTd>
+                  <AdminTd>
                     <span className="inline-flex items-center rounded-lg bg-[var(--primary-blue)]/10 px-2.5 py-1.5 font-mono text-sm font-bold tracking-wider text-[var(--primary-blue)]">
                       {pin.pinCode}
                     </span>
-                  </AdminTd>
-                  <AdminTd className="text-sm text-zinc-600">
-                    {pin.receiptNumber ?? "—"}
                   </AdminTd>
                   <AdminTd className="font-semibold text-zinc-800">
                     {formatCurrency(pin.amount)}

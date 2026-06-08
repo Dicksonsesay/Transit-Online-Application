@@ -1,10 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import type { PinStatus } from "@/generated/prisma/client";
 
+export function formatPinReceiptNumber(pin: {
+  id: number;
+  receiptNumber: string | null;
+  createdAt: Date | string;
+}): string {
+  const trimmed = pin.receiptNumber?.trim();
+  if (trimmed) return trimmed;
+
+  const created =
+    typeof pin.createdAt === "string" ? new Date(pin.createdAt) : pin.createdAt;
+  const year = created.getFullYear();
+  return `RCP-${year}-${String(pin.id).padStart(5, "0")}`;
+}
+
 export type PinListItem = {
   id: number;
   pinCode: string;
-  receiptNumber: string | null;
+  receiptNumber: string;
   amount: string;
   status: PinStatus;
   createdAt: string;
@@ -28,7 +42,7 @@ export async function listAdmissionPins(): Promise<PinListItem[]> {
   return pins.map((pin) => ({
     id: pin.id,
     pinCode: pin.pinCode,
-    receiptNumber: pin.receiptNumber,
+    receiptNumber: formatPinReceiptNumber(pin),
     amount: pin.amount.toString(),
     status: pin.status,
     createdAt: pin.createdAt.toISOString(),
@@ -60,9 +74,7 @@ export async function getPinReceiptData(pinId: number) {
 
   return {
     pinCode: pin.pinCode,
-    receiptNumber:
-      pin.receiptNumber ??
-      `RCP-${new Date().getFullYear()}-${String(pin.id).padStart(5, "0")}`,
+    receiptNumber: formatPinReceiptNumber(pin),
     amount: pin.amount.toString(),
     generatedByName: pin.generatedBy.fullname,
     createdAt: pin.createdAt.toISOString(),
