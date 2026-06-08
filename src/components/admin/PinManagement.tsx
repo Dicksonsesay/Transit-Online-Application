@@ -2,7 +2,8 @@
 
 import { useActionState, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FiCopy, FiKey, FiPlus, FiTrash2, FiUserCheck } from "react-icons/fi";
+import { FiCopy, FiDollarSign, FiKey, FiPlus, FiPrinter, FiTrash2, FiUserCheck } from "react-icons/fi";
+import AdminExportToolbar, { openPinReceipt } from "@/components/admin/AdminExportToolbar";
 import {
   deleteUnusedPinAction,
   generateAdmissionPinAction,
@@ -30,6 +31,7 @@ import {
   Swal,
 } from "@/lib/alerts";
 import { DEFAULT_ADMISSION_PIN_AMOUNT } from "@/lib/constants";
+import type { PinRevenueSummary } from "@/lib/admin-export/pin-export";
 import type { PinListItem } from "@/lib/admin-pins";
 import type { PinStatus } from "@/generated/prisma/client";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
@@ -37,6 +39,7 @@ import { cn, formatCurrency, formatDate } from "@/lib/utils";
 type PinManagementProps = {
   pins: PinListItem[];
   stats: { unused: number; used: number; total: number };
+  revenue: PinRevenueSummary;
 };
 
 type FilterStatus = "all" | PinStatus;
@@ -52,7 +55,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
-export default function PinManagement({ pins, stats }: PinManagementProps) {
+export default function PinManagement({ pins, stats, revenue }: PinManagementProps) {
   const router = useRouter();
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [showForm, setShowForm] = useState(false);
@@ -69,20 +72,25 @@ export default function PinManagement({ pins, stats }: PinManagementProps) {
     return pins.filter((pin) => pin.status === filter);
   }, [pins, filter]);
 
-  async function handleGenerateSuccess(pinCode: string) {
+  async function handleGenerateSuccess(pinCode: string, pinId?: number) {
     const copyResult = await Swal.fire({
       icon: "success",
       title: "PIN generated",
       html: `<p class="text-sm text-zinc-600 mb-3">Give this PIN to the student after bank payment. They use it at <strong>Verify PIN</strong> to register.</p>
         <p class="font-mono text-2xl font-bold tracking-wide text-[#003e91]">${pinCode}</p>`,
-      confirmButtonText: "Copy PIN",
+      confirmButtonText: pinId ? "Print receipt" : "Copy PIN",
+      showDenyButton: Boolean(pinId),
+      denyButtonText: "Copy PIN",
       showCancelButton: true,
       cancelButtonText: "Close",
       confirmButtonColor: "#003e91",
+      denyButtonColor: "#059669",
       cancelButtonColor: "#6c757d",
     });
 
-    if (copyResult.isConfirmed) {
+    if (copyResult.isConfirmed && pinId) {
+      openPinReceipt(pinId);
+    } else if (copyResult.isDenied || (copyResult.isConfirmed && !pinId)) {
       const copied = await copyToClipboard(pinCode);
       if (copied) {
         await showSuccess("Copied", "PIN copied to clipboard.");
@@ -101,8 +109,8 @@ export default function PinManagement({ pins, stats }: PinManagementProps) {
       return;
     }
     celebratedPinRef.current = pinCode;
-    void handleGenerateSuccess(pinCode);
-  }, [generateState.pinCode, generating]);
+    void handleGenerateSuccess(pinCode, generateState.pinId);
+  }, [generateState.pinCode, generateState.pinId, generating]);
 
   async function handleCopy(pinCode: string) {
     const copied = await copyToClipboard(pinCode);
@@ -156,6 +164,15 @@ export default function PinManagement({ pins, stats }: PinManagementProps) {
       iconClass: "bg-blue-600 text-white",
       valueClass: "text-blue-800",
     },
+    {
+      label: "Total collected",
+      value: formatCurrency(revenue.totalAmount),
+      helper: `${stats.used} used · ${stats.unused} unused`,
+      icon: FiDollarSign,
+      cardClass: "border-amber-200 bg-gradient-to-br from-amber-50 via-white to-yellow-50",
+      iconClass: "bg-amber-500 text-white",
+      valueClass: "text-amber-800",
+    },
   ];
 
   return (
@@ -167,7 +184,54 @@ export default function PinManagement({ pins, stats }: PinManagementProps) {
         accentClass="from-[var(--dark-blue)] via-[var(--hero-blue)] to-[#0d4a94]"
       />
 
-      <AdminStatGrid items={statCards} className="sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3" />
+      <AdminStatGrid items={statCards} className="sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4" />
+
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm ring-1 ring-slate-900/5 sm:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-[var(--primary-blue)]">PIN revenue summary</h3>
+            <p className="mt-1 text-xs text-zinc-500">
+              Standard admission fee: {formatCurrency(DEFAULT_ADMISSION_PIN_AMOUNT)} per PIN
+            </p>
+          </div>
+          <AdminExportToolbar
+            basePath="/api/admin/pins/export"
+            query={{ status: filter === "all" ? undefined : filter }}
+          />
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {[
+            {
+              label: "Total value",
+              amount: revenue.totalAmount,
+              detail: `${revenue.totalPins} PINs`,
+            },
+            {
+              label: "Used (redeemed)",
+              amount: revenue.usedAmount,
+              detail: `${revenue.usedCount} PINs`,
+            },
+            {
+              label: "Unused (outstanding)",
+              amount: revenue.unusedAmount,
+              detail: `${revenue.unusedCount} PINs`,
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3"
+            >
+              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                {item.label}
+              </p>
+              <p className="mt-1 text-lg font-bold text-[var(--primary-blue)]">
+                {formatCurrency(item.amount)}
+              </p>
+              <p className="text-xs text-zinc-500">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm ring-1 ring-slate-900/5 sm:flex-row sm:items-center sm:justify-between">
         <AdminFilterTabs
@@ -334,6 +398,15 @@ export default function PinManagement({ pins, stats }: PinManagementProps) {
                   </AdminTd>
                   <AdminTd>
                     <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => openPinReceipt(pin.id)}
+                        className="rounded-xl p-2.5 text-emerald-700 transition-colors hover:bg-emerald-50"
+                        title="Print receipt"
+                        aria-label={`Print receipt for ${pin.pinCode}`}
+                      >
+                        <FiPrinter size={16} aria-hidden />
+                      </button>
                       <button
                         type="button"
                         onClick={() => handleCopy(pin.pinCode)}

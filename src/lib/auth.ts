@@ -90,11 +90,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, profile }) {
       if (account?.provider === "google" && user) {
         token.id = account.providerAccountId;
         token.email = user.email;
         token.name = user.name;
+        const googleProfile = profile as { email_verified?: boolean } | undefined;
+        token.emailVerified = googleProfile?.email_verified ?? true;
       } else if (user) {
         token.role = (user as { role?: string }).role;
         token.id = user.id;
@@ -105,6 +107,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         (session.user as { role?: string }).role = token.role as string;
+        session.user.emailVerified = token.emailVerified;
       }
       return session;
     },

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
-import AdminReportsPDFDocument from "@/components/admin/AdminReportsPDFDocument";
-import { getAdminReportsData } from "@/lib/admin-reports";
+import AcceptedStudentsPDFDocument from "@/components/admin/pdf/AcceptedStudentsPDFDocument";
 import {
-  buildReportsCsv,
-  buildReportsWorkbook,
-  reportExportFilename,
-} from "@/lib/admin-report-export";
+  acceptedExportFilename,
+  buildAcceptedStudentsCsv,
+  buildAcceptedStudentsWorkbook,
+  getAcceptedStudentsForExport,
+} from "@/lib/admin-export/accepted-export";
 import { getCollegeBranding } from "@/lib/pdf/college-branding";
 import { requireAdminSession } from "@/lib/session";
 
@@ -23,35 +23,37 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid export format" }, { status: 400 });
   }
 
-  const [report, branding] = await Promise.all([
-    getAdminReportsData(),
+  const [{ students }, branding] = await Promise.all([
+    getAcceptedStudentsForExport(),
     getCollegeBranding(),
   ]);
 
   if (format === "csv") {
-    const body = buildReportsCsv(report);
-    return new NextResponse(body, {
-      headers: {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${reportExportFilename("csv")}"`,
-      },
-    });
+    return new NextResponse(
+      buildAcceptedStudentsCsv(students, branding.collegeName),
+      {
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": `attachment; filename="${acceptedExportFilename("csv")}"`,
+        },
+      }
+    );
   }
 
   if (format === "xlsx") {
-    const buffer = buildReportsWorkbook(report);
+    const buffer = buildAcceptedStudentsWorkbook(students, branding.collegeName);
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "Content-Disposition": `attachment; filename="${reportExportFilename("xlsx")}"`,
+        "Content-Disposition": `attachment; filename="${acceptedExportFilename("xlsx")}"`,
       },
     });
   }
 
   const pdfBuffer = await renderToBuffer(
-    <AdminReportsPDFDocument
-      report={report}
+    <AcceptedStudentsPDFDocument
+      students={students}
       collegeName={branding.collegeName}
       tagline={branding.tagline}
       logoSrc={branding.logoSrc}
@@ -61,7 +63,7 @@ export async function GET(request: Request) {
   return new NextResponse(new Uint8Array(pdfBuffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${reportExportFilename("pdf")}"`,
+      "Content-Disposition": `attachment; filename="${acceptedExportFilename("pdf")}"`,
     },
   });
 }

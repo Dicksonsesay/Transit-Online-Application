@@ -47,3 +47,24 @@ export async function getPinStats() {
   ]);
   return { unused, used, total };
 }
+
+export async function getPinReceiptData(pinId: number) {
+  const pin = await prisma.pin.findUnique({
+    where: { id: pinId },
+    include: {
+      generatedBy: { select: { fullname: true } },
+    },
+  });
+
+  if (!pin) return null;
+
+  return {
+    pinCode: pin.pinCode,
+    receiptNumber:
+      pin.receiptNumber ??
+      `RCP-${new Date().getFullYear()}-${String(pin.id).padStart(5, "0")}`,
+    amount: pin.amount.toString(),
+    generatedByName: pin.generatedBy.fullname,
+    createdAt: pin.createdAt.toISOString(),
+  };
+}

@@ -11,6 +11,7 @@ import { PinStatus } from "@/generated/prisma/client";
 export type GeneratePinState = {
   error?: string;
   pinCode?: string;
+  pinId?: number;
 };
 
 function parseAdminId(sessionUserId: string | undefined): number | null {
@@ -45,7 +46,7 @@ export async function generateAdmissionPinAction(
   try {
     const pinCode = await generateUniquePinCode();
 
-    await prisma.pin.create({
+    const pin = await prisma.pin.create({
       data: {
         pinCode,
         amount,
@@ -55,8 +56,19 @@ export async function generateAdmissionPinAction(
       },
     });
 
+    const year = new Date().getFullYear();
+    const finalReceiptNumber =
+      receiptNumber ?? `RCP-${year}-${String(pin.id).padStart(5, "0")}`;
+
+    if (!receiptNumber) {
+      await prisma.pin.update({
+        where: { id: pin.id },
+        data: { receiptNumber: finalReceiptNumber },
+      });
+    }
+
     revalidatePath("/admin/pins");
-    return { pinCode };
+    return { pinCode, pinId: pin.id };
   } catch {
     return { error: "Could not generate PIN. Please try again." };
   }

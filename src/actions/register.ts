@@ -6,7 +6,13 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { GOOGLE_REGISTER_COOKIE, VERIFIED_PIN_COOKIE } from "@/lib/constants";
+import {
+  markGoogleRegisterSessionVerified,
+  readGoogleRegisterSession,
+  refreshGoogleRegisterVerificationCode,
+} from "@/lib/google-register-session";
 import { registerStudentWithGoogle } from "@/lib/google-student-auth";
+import { isGoogleVerificationCodeValid } from "@/lib/google-verification";
 import { PinStatus, StudentAccountStatus } from "@/generated/prisma/client";
 import { setStudentSessionCookie } from "@/lib/student-session";
 
@@ -22,6 +28,12 @@ export type RegisterResult =
 
 export type RegisterFormState = {
   error?: string;
+  success?: string;
+};
+
+export type GoogleVerifyFormState = {
+  error?: string;
+  success?: string;
 };
 
 function generateApplicationNumber(id: number) {
@@ -136,30 +148,86 @@ export async function registerStudent(
   }
 }
 
-/** Complete registration after Google identity verification. */
-export async function registerWithGoogleAction(
-  _prevState: RegisterFormState,
-  _formData: FormData
-): Promise<RegisterFormState> {
-  const cookieStore = await cookies();
-  const rawProfile = cookieStore.get(GOOGLE_REGISTER_COOKIE)?.value;
+export async function verifyGoogleEmailCodeAction(
+  _prevState: GoogleVerifyFormState,
+  formData: FormData
+): Promise<GoogleVerifyFormState> {
+  const code = formData.get("verificationCode")?.toString().trim() ?? "";
+  const session = await readGoogleRegisterSession();
 
-  if (!rawProfile) {
+  if (!session) {
     return {
       error: "Google verification expired. Please sign in with Google again.",
     };
   }
 
-  let profile: { email: string; fullname: string; googleId: string };
-  try {
-    profile = JSON.parse(rawProfile) as {
-      email: string;
-      fullname: string;
-      googleId: string;
-    };
-  } catch {
-    return { error: "Invalid Google session. Please sign in with Google again." };
+  if (session.verified) {
+    return { success: "Your Google email is already verified. You can create your account." };
   }
+
+  if (Date.now() > session.expiresAt) {
+    return {
+      error: "This verification code has expired. Click “Resend code” to get a new one.",
+    };
+  }
+
+  if (!isGoogleVerificationCodeValid(code, session.codeHash)) {
+    return { error: "Invalid verification code. Check your email and try again." };
+  }
+
+  await markGoogleRegisterSessionVerified(session);
+  return {
+    success: "Google email verified. You can now create your student account.",
+  };
+}
+
+export async function resendGoogleVerificationCodeAction(): Promise<GoogleVerifyFormState> {
+  const session = await readGoogleRegisterSession();
+
+  if (!session) {
+    return {
+      error: "Google verification expired. Please sign in with Google again.",
+    };
+  }
+
+  if (session.verified) {
+    return { success: "Your Google email is already verified." };
+  }
+
+  const result = await refreshGoogleRegisterVerificationCode(session);
+  if (!result.ok) {
+    return { error: result.error };
+  }
+
+  return {
+    success: `A new verification code has been sent to ${session.email}.`,
+  };
+}
+
+/** Complete registration after Google identity verification. */
+export async function registerWithGoogleAction(
+  _prevState: RegisterFormState,
+  _formData: FormData
+): Promise<RegisterFormState> {
+  const session = await readGoogleRegisterSession();
+
+  if (!session) {
+    return {
+      error: "Google verification expired. Please sign in with Google again.",
+    };
+  }
+
+  if (!session.verified) {
+    return {
+      error: "Enter the verification code sent to your Google email before creating your account.",
+    };
+  }
+
+  const profile = {
+    email: session.email,
+    fullname: session.fullname,
+    googleId: session.googleId,
+  };
 
   const result = await registerStudentWithGoogle(profile);
 

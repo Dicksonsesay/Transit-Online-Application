@@ -14,6 +14,54 @@ export type GoogleStudentProfile = {
   googleId: string;
 };
 
+export async function assertGoogleAccountCanRegister(
+  profile: GoogleStudentProfile
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const email = profile.email.trim().toLowerCase();
+  const googleId = profile.googleId.trim();
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, error: "Google did not provide a valid email address." };
+  }
+
+  const [existingGoogleId, existingEmail] = await Promise.all([
+    prisma.student.findUnique({
+      where: { googleId },
+      select: { id: true, email: true },
+    }),
+    prisma.student.findUnique({
+      where: { email },
+      select: { id: true, googleId: true },
+    }),
+  ]);
+
+  if (existingGoogleId) {
+    return {
+      ok: false,
+      error:
+        "This Google account is already linked to a student profile. Please log in instead.",
+    };
+  }
+
+  if (existingEmail?.googleId && existingEmail.googleId !== googleId) {
+    return {
+      ok: false,
+      error:
+        "This email is already registered with a different Google account. Please log in or contact admissions.",
+    };
+  }
+
+  if (existingEmail && !existingEmail.googleId) {
+    return {
+      ok: false,
+      error:
+        "An account with this email already exists. Log in with your PIN and password, or contact admissions.",
+    };
+  }
+
+  return { ok: true };
+}
+
 export async function registerStudentWithGoogle(
   profile: GoogleStudentProfile
 ): Promise<{ success: true; studentId: number } | { success: false; error: string }> {
@@ -62,23 +110,9 @@ export async function registerStudentWithGoogle(
     };
   }
 
-  const existingEmail = await prisma.student.findUnique({
-    where: { email },
-    select: { id: true, googleId: true },
-  });
-
-  if (existingEmail) {
-    if (!existingEmail.googleId) {
-      await prisma.student.update({
-        where: { id: existingEmail.id },
-        data: { googleId: profile.googleId },
-      });
-      return { success: true, studentId: existingEmail.id };
-    }
-    return {
-      success: false,
-      error: "An account with this email already exists. Please log in instead.",
-    };
+  const availability = await assertGoogleAccountCanRegister(profile);
+  if (!availability.ok) {
+    return { success: false, error: availability.error };
   }
 
   try {
@@ -164,6 +198,19 @@ export async function loginStudentWithGoogle(
   }
 
   if (!student.googleId) {
+    const linkedElsewhere = await prisma.student.findUnique({
+      where: { googleId: profile.googleId },
+      select: { id: true },
+    });
+
+    if (linkedElsewhere && linkedElsewhere.id !== student.id) {
+      return {
+        success: false,
+        error:
+          "This Google account is already linked to another student profile. Use the correct Google account.",
+      };
+    }
+
     await prisma.student.update({
       where: { id: student.id },
       data: { googleId: profile.googleId },

@@ -16,6 +16,7 @@ import {
   sendAcceptanceLetterAction,
 } from "@/actions/admin-acceptance-letters";
 import { AdminPageIntro, AdminToolbar } from "@/components/admin/ui/AdminToolbar";
+import AdminExportToolbar from "@/components/admin/AdminExportToolbar";
 import { AdminStatGrid, type AdminStatItem } from "@/components/admin/ui/AdminStatGrid";
 import {
   AdminTable,
@@ -158,9 +159,12 @@ export default function AcceptanceLetterManagement({
         onSearchChange={setQuery}
         searchPlaceholder="Search by name, email, programme or course…"
         meta={
-          <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">
-            {filtered.length} accepted
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">
+              {filtered.length} accepted
+            </span>
+            <AdminExportToolbar compact basePath="/api/admin/offer-admission/export" />
+          </div>
         }
       />
 

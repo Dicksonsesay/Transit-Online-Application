@@ -1,69 +1,40 @@
-import {
-  Document,
-  Page,
-  StyleSheet,
-  Text,
-  View,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, View } from "@react-pdf/renderer";
+import PdfDocumentHeader from "@/components/admin/pdf/PdfDocumentHeader";
 import type { AdminReportsData } from "@/lib/admin-reports";
-
-const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontSize: 10,
-    fontFamily: "Helvetica",
-    color: "#1e293b",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#003e91",
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 9,
-    color: "#64748b",
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "#003e91",
-    marginTop: 16,
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
-    paddingBottom: 4,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 4,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#f1f5f9",
-  },
-  label: { color: "#475569" },
-  value: { fontWeight: "bold", color: "#003e91" },
-});
+import {
+  formatPdfCurrency,
+  formatPdfDate,
+  pdfBaseStyles,
+  PDF_COLORS,
+} from "@/lib/pdf/pdf-styles";
 
 type AdminReportsPDFDocumentProps = {
   report: AdminReportsData;
   collegeName?: string;
+  tagline?: string;
+  logoSrc?: string;
 };
 
 export default function AdminReportsPDFDocument({
   report,
   collegeName = "Transit College Sierra Leone",
+  tagline,
+  logoSrc,
 }: AdminReportsPDFDocumentProps) {
-  const generated = new Date(report.generatedAt).toLocaleString("en-GB");
+  const generated = formatPdfDate(report.generatedAt);
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.title}>{collegeName}</Text>
-        <Text style={styles.subtitle}>Admissions Report — Generated {generated}</Text>
+      <Page size="A4" style={pdfBaseStyles.page}>
+        <PdfDocumentHeader
+          collegeName={collegeName}
+          tagline={tagline}
+          logoSrc={logoSrc}
+          title="Admissions Operations Report"
+          subtitle={`Generated ${generated}`}
+        />
 
-        <Text style={styles.sectionTitle}>Summary</Text>
+        <Text style={pdfBaseStyles.sectionTitle}>Executive Summary</Text>
         {[
           ["Total Applications", report.totals.applications],
           ["Accepted", report.totals.accepted],
@@ -74,56 +45,108 @@ export default function AdminReportsPDFDocument({
           ["PINs Issued", report.totals.pinsIssued],
           ["Offers of Admission", report.totals.acceptanceLetters],
         ].map(([label, value]) => (
-          <View key={String(label)} style={styles.row}>
-            <Text style={styles.label}>{label}</Text>
-            <Text style={styles.value}>{value}</Text>
+          <View key={String(label)} style={pdfBaseStyles.summaryRow}>
+            <Text style={{ fontSize: 9, color: PDF_COLORS.muted }}>{label}</Text>
+            <Text style={{ fontSize: 9, fontWeight: "bold", color: PDF_COLORS.primary }}>
+              {value}
+            </Text>
           </View>
         ))}
 
-        <Text style={styles.sectionTitle}>Conversion</Text>
+        <Text style={pdfBaseStyles.sectionTitle}>PIN Revenue</Text>
+        <View style={pdfBaseStyles.summaryBox}>
+          {[
+            [
+              "Total PIN value",
+              `${report.pinRevenue.usedCount + report.pinRevenue.unusedCount} PINs`,
+              formatPdfCurrency(report.pinRevenue.totalAmount),
+            ],
+            [
+              "Used (redeemed)",
+              `${report.pinRevenue.usedCount} PINs`,
+              formatPdfCurrency(report.pinRevenue.usedAmount),
+            ],
+            [
+              "Unused (outstanding)",
+              `${report.pinRevenue.unusedCount} PINs`,
+              formatPdfCurrency(report.pinRevenue.unusedAmount),
+            ],
+          ].map(([label, count, amount]) => (
+            <View key={String(label)} style={pdfBaseStyles.summaryRow}>
+              <Text style={{ fontSize: 9, color: PDF_COLORS.muted }}>
+                {label} · {count}
+              </Text>
+              <Text style={{ fontSize: 9, fontWeight: "bold" }}>{amount}</Text>
+            </View>
+          ))}
+        </View>
+
+        <Text style={pdfBaseStyles.sectionTitle}>Conversion Metrics</Text>
         {[
           ["Acceptance Rate", `${report.conversion.acceptanceRate}%`],
           ["Rejection Rate", `${report.conversion.rejectionRate}%`],
           ["Decision Completion", `${report.conversion.completionRate}%`],
         ].map(([label, value]) => (
-          <View key={String(label)} style={styles.row}>
-            <Text style={styles.label}>{label}</Text>
-            <Text style={styles.value}>{value}</Text>
+          <View key={String(label)} style={pdfBaseStyles.summaryRow}>
+            <Text style={{ fontSize: 9, color: PDF_COLORS.muted }}>{label}</Text>
+            <Text style={{ fontSize: 9, fontWeight: "bold" }}>{value}</Text>
           </View>
         ))}
 
-        <Text style={styles.sectionTitle}>Application Status</Text>
+        <Text style={pdfBaseStyles.sectionTitle}>Application Status</Text>
         {report.applicationsByStatus.map((status) => (
-          <View key={status.label} style={styles.row}>
-            <Text style={styles.label}>{status.label}</Text>
-            <Text style={styles.value}>{status.value}</Text>
+          <View key={status.label} style={pdfBaseStyles.summaryRow}>
+            <Text style={{ fontSize: 9, color: PDF_COLORS.muted }}>{status.label}</Text>
+            <Text style={{ fontSize: 9, fontWeight: "bold" }}>{status.value}</Text>
           </View>
         ))}
 
-        <Text style={styles.sectionTitle}>Monthly Applications</Text>
-        {report.monthlyApplications.map((month) => (
-          <View key={month.monthLabel} style={styles.row}>
-            <Text style={styles.label}>{month.monthLabel}</Text>
-            <Text style={styles.value}>{month.count}</Text>
-          </View>
-        ))}
+        <View style={pdfBaseStyles.footer} fixed>
+          <Text style={pdfBaseStyles.footerText}>{collegeName}</Text>
+          <Text
+            style={pdfBaseStyles.footerText}
+            render={({ pageNumber, totalPages }) =>
+              `Page ${pageNumber} of ${totalPages}`
+            }
+          />
+        </View>
       </Page>
 
-      {report.programmeBreakdown.length > 0 && (
-        <Page size="A4" style={styles.page}>
-          <Text style={styles.sectionTitle}>Top Programmes</Text>
-          {report.programmeBreakdown.map((programme) => (
-            <View key={programme.programmeName} style={styles.row}>
-              <Text style={[styles.label, { maxWidth: "70%" }]}>
-                {programme.programmeName}
-              </Text>
-              <Text style={styles.value}>
-                {programme.count} ({programme.share}%)
-              </Text>
-            </View>
-          ))}
-        </Page>
-      )}
+      <Page size="A4" style={pdfBaseStyles.page}>
+        <Text style={pdfBaseStyles.sectionTitle}>Monthly Applications</Text>
+        {report.monthlyApplications.map((month) => (
+          <View key={month.monthLabel} style={pdfBaseStyles.summaryRow}>
+            <Text style={{ fontSize: 9, color: PDF_COLORS.muted }}>{month.monthLabel}</Text>
+            <Text style={{ fontSize: 9, fontWeight: "bold" }}>{month.count}</Text>
+          </View>
+        ))}
+
+        {report.programmeBreakdown.length > 0 ? (
+          <>
+            <Text style={pdfBaseStyles.sectionTitle}>Top Programmes</Text>
+            {report.programmeBreakdown.map((programme) => (
+              <View key={programme.programmeName} style={pdfBaseStyles.summaryRow}>
+                <Text style={{ fontSize: 9, color: PDF_COLORS.muted, maxWidth: "70%" }}>
+                  {programme.programmeName}
+                </Text>
+                <Text style={{ fontSize: 9, fontWeight: "bold" }}>
+                  {programme.count} ({programme.share}%)
+                </Text>
+              </View>
+            ))}
+          </>
+        ) : null}
+
+        <View style={pdfBaseStyles.footer} fixed>
+          <Text style={pdfBaseStyles.footerText}>{collegeName}</Text>
+          <Text
+            style={pdfBaseStyles.footerText}
+            render={({ pageNumber, totalPages }) =>
+              `Page ${pageNumber} of ${totalPages}`
+            }
+          />
+        </View>
+      </Page>
     </Document>
   );
 }

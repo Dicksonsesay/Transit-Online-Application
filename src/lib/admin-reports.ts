@@ -1,4 +1,6 @@
 import { resolveProgrammeFromFormPayload } from "@/lib/application-form/programme-resolution";
+import { summarizePinRevenue } from "@/lib/admin-export/pin-export";
+import { listAdmissionPins } from "@/lib/admin-pins";
 import { prisma } from "@/lib/prisma";
 
 export type AdminReportsData = {
@@ -12,6 +14,13 @@ export type AdminReportsData = {
     interviewsCompleted: number;
     pinsIssued: number;
     acceptanceLetters: number;
+  };
+  pinRevenue: {
+    totalAmount: number;
+    usedAmount: number;
+    unusedAmount: number;
+    usedCount: number;
+    unusedCount: number;
   };
   conversion: {
     acceptanceRate: number;
@@ -50,6 +59,7 @@ export async function getAdminReportsData(): Promise<AdminReportsData> {
     interviewsCompleted,
     pinsIssued,
     acceptanceLetters,
+    pins,
   ] = await Promise.all([
     prisma.application.findMany({
       select: {
@@ -73,7 +83,10 @@ export async function getAdminReportsData(): Promise<AdminReportsData> {
     prisma.interview.count({ where: { interviewStatus: "completed" } }),
     prisma.pin.count(),
     prisma.acceptanceLetter.count(),
+    listAdmissionPins(),
   ]);
+
+  const pinRevenueSummary = summarizePinRevenue(pins);
 
   const inReview = submitted + underReview;
   const acceptanceRate =
@@ -135,6 +148,13 @@ export async function getAdminReportsData(): Promise<AdminReportsData> {
       interviewsCompleted,
       pinsIssued,
       acceptanceLetters,
+    },
+    pinRevenue: {
+      totalAmount: pinRevenueSummary.totalAmount,
+      usedAmount: pinRevenueSummary.usedAmount,
+      unusedAmount: pinRevenueSummary.unusedAmount,
+      usedCount: pinRevenueSummary.usedCount,
+      unusedCount: pinRevenueSummary.unusedCount,
     },
     conversion: {
       acceptanceRate,

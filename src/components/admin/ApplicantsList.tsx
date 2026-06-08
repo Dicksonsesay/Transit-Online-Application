@@ -22,6 +22,7 @@ import {
   AdminTh,
 } from "@/components/admin/ui/AdminTable";
 import ApplicantDecisionActions from "@/components/admin/ApplicantDecisionActions";
+import AdminExportToolbar from "@/components/admin/AdminExportToolbar";
 import { applicationStatusLabel } from "@/lib/application-status";
 import type { ApplicantListItem } from "@/lib/admin-applicants";
 import type { ApplicationStatus } from "@/generated/prisma/client";
@@ -144,18 +145,27 @@ export default function ApplicantsList({ applicants, stats }: ApplicantsListProp
         onSearchChange={setQuery}
         searchPlaceholder="Search by name, email, application no., or course…"
         meta={
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-            className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm font-medium text-zinc-700 outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
-          >
-            <option value="all">All statuses</option>
-            {(Object.keys(applicationStatusLabel) as ApplicationStatus[]).map((s) => (
-              <option key={s} value={s}>
-                {applicationStatusLabel[s]}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+              className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm font-medium text-zinc-700 outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
+            >
+              <option value="all">All statuses</option>
+              {(Object.keys(applicationStatusLabel) as ApplicationStatus[]).map((s) => (
+                <option key={s} value={s}>
+                  {applicationStatusLabel[s]}
+                </option>
+              ))}
+            </select>
+            <AdminExportToolbar
+              compact
+              basePath="/api/admin/applicants/export"
+              query={{
+                status: statusFilter === "all" ? undefined : statusFilter,
+              }}
+            />
+          </div>
         }
       />
 

@@ -16,6 +16,7 @@ import {
   updateInterviewStatusAction,
 } from "@/actions/admin-interviews";
 import { AdminPageIntro, AdminToolbar } from "@/components/admin/ui/AdminToolbar";
+import AdminExportToolbar from "@/components/admin/AdminExportToolbar";
 import { AdminStatGrid, type AdminStatItem } from "@/components/admin/ui/AdminStatGrid";
 import {
   AdminPrimaryButton,
@@ -195,9 +196,12 @@ export default function InterviewManagement({
         onSearchChange={setQuery}
         searchPlaceholder="Search by applicant, application no., or venue…"
         meta={
-          <span className="text-xs font-medium text-zinc-500">
-            {filtered.length} of {interviews.length} records
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-zinc-500">
+              {filtered.length} of {interviews.length} records
+            </span>
+            <AdminExportToolbar compact basePath="/api/admin/interviews/export" />
+          </div>
         }
       >
         <AdminPrimaryButton onClick={() => setShowForm((v) => !v)}>

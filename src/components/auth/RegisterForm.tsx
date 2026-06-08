@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 import { FiCheckCircle, FiMail, FiUser } from "react-icons/fi";
 import PasswordInput from "@/components/ui/PasswordInput";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
+import GoogleEmailVerificationForm from "@/components/auth/GoogleEmailVerificationForm";
 import {
   clearGoogleRegisterAction,
   registerStudentAction,
@@ -23,15 +25,21 @@ export type GoogleRegisterProfile = {
 type RegisterFormProps = {
   googleEnabled?: boolean;
   googleProfile?: GoogleRegisterProfile;
+  googleEmailVerified?: boolean;
+  showGoogleVerificationNotice?: boolean;
   initialError?: string;
 };
 
 export default function RegisterForm({
   googleEnabled = false,
   googleProfile,
+  googleEmailVerified = false,
+  showGoogleVerificationNotice = false,
   initialError,
 }: RegisterFormProps) {
+  const router = useRouter();
   const usingGoogle = Boolean(googleProfile);
+  const googleReady = usingGoogle && googleEmailVerified;
   const [state, formAction, pending] = useActionState(
     usingGoogle ? registerWithGoogleAction : registerStudentAction,
     initialState
@@ -51,17 +59,36 @@ export default function RegisterForm({
           Create Account
         </h1>
         <p className="mt-1 text-sm text-zinc-600">
-          {usingGoogle
-            ? "Your Google account has been verified. Review your details below, then create your account."
-            : "Create your account manually or verify with Google after PIN verification."}
+          {googleReady
+            ? "Your Google email is verified. Review your details below, then create your account."
+            : usingGoogle
+              ? "Confirm the verification code sent to your Google email to continue."
+              : "Create your account manually or verify with Google after PIN verification."}
         </p>
 
-        {usingGoogle ? (
+        {showGoogleVerificationNotice && googleProfile ? (
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+            <FiMail className="mt-0.5 shrink-0" size={16} aria-hidden />
+            <p>
+              A verification code has been sent to your Google email. Enter it below to
+              continue. Each Google account can only be used once.
+            </p>
+          </div>
+        ) : null}
+
+        {usingGoogle && !googleEmailVerified && googleProfile ? (
+          <GoogleEmailVerificationForm
+            email={googleProfile.email}
+            onVerified={() => router.refresh()}
+          />
+        ) : null}
+
+        {googleReady ? (
           <div className="mt-4 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-800">
             <FiCheckCircle className="mt-0.5 shrink-0" size={16} aria-hidden />
             <p>
-              Signed in with Google. Your name and email are verified and will
-              be used for your student account.
+              Google email verified. Your name and email will be used for your student
+              account.
             </p>
           </div>
         ) : null}
@@ -149,7 +176,7 @@ export default function RegisterForm({
 
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || (usingGoogle && !googleEmailVerified)}
           className="mt-3 w-full rounded-lg bg-[var(--hero-blue)] py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending
@@ -158,6 +185,12 @@ export default function RegisterForm({
               ? "Create Account with Google"
               : "Create Account & Continue"}
         </button>
+
+        {usingGoogle && !googleEmailVerified ? (
+          <p className="mt-2 text-center text-xs text-zinc-500">
+            Verify your Google email above before creating your account.
+          </p>
+        ) : null}
 
         {usingGoogle ? (
           <button

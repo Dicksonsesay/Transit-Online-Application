@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { loginStudentWithGoogle } from "@/lib/google-student-auth";
-import { GOOGLE_LOGIN_PIN_COOKIE, GOOGLE_REGISTER_COOKIE } from "@/lib/constants";
+import {
+  assertGoogleAccountCanRegister,
+  loginStudentWithGoogle,
+} from "@/lib/google-student-auth";
+import {
+  createGoogleRegisterVerification,
+  setGoogleRegisterSessionOnResponse,
+} from "@/lib/google-register-session";
+import { GOOGLE_LOGIN_PIN_COOKIE } from "@/lib/constants";
 import { appendStudentSessionCookie } from "@/lib/student-session";
 import { prisma } from "@/lib/prisma";
 
@@ -39,20 +46,42 @@ export async function GET(request: NextRequest) {
     };
 
     if (mode === "register") {
+      if (session.user?.emailVerified === false) {
+        return NextResponse.redirect(
+          new URL(
+            `/auth/register?error=${encodeURIComponent(
+              "Your Google email is not verified. Use a registered Google account with a verified email address."
+            )}`,
+            request.nextUrl.origin
+          )
+        );
+      }
+
+      const availability = await assertGoogleAccountCanRegister(profile);
+      if (!availability.ok) {
+        const response = NextResponse.redirect(
+          new URL(
+            `/auth/register?error=${encodeURIComponent(availability.error)}`,
+            request.nextUrl.origin
+          )
+        );
+        return response;
+      }
+
+      const verification = await createGoogleRegisterVerification(profile);
+      if (!verification.ok) {
+        return NextResponse.redirect(
+          new URL(
+            `/auth/register?error=${encodeURIComponent(verification.error)}`,
+            request.nextUrl.origin
+          )
+        );
+      }
+
       const response = NextResponse.redirect(
         new URL("/auth/register?from=google", request.nextUrl.origin)
       );
-      response.cookies.set(
-        GOOGLE_REGISTER_COOKIE,
-        JSON.stringify(profile),
-        {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 60 * 15,
-          path: "/",
-        }
-      );
+      setGoogleRegisterSessionOnResponse(response, verification.session);
       return response;
     }
 
