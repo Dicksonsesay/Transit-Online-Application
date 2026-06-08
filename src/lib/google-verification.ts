@@ -25,12 +25,16 @@ function verificationSecret() {
 
 export function hashGoogleVerificationCode(code: string) {
   return createHash("sha256")
-    .update(`${verificationSecret()}:${code.trim()}`)
+    .update(`${verificationSecret()}:${normalizeGoogleVerificationCode(code)}`)
     .digest("hex");
 }
 
+export function normalizeGoogleVerificationCode(code: string) {
+  return code.replace(/\D/g, "").trim();
+}
+
 export function isGoogleVerificationCodeValid(code: string, codeHash: string) {
-  const normalized = code.trim();
+  const normalized = normalizeGoogleVerificationCode(code);
   if (!/^\d{6}$/.test(normalized)) {
     return false;
   }

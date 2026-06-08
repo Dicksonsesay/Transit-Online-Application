@@ -82,7 +82,6 @@ export default function GoogleEmailVerificationForm({
             name="verificationCode"
             inputMode="numeric"
             autoComplete="one-time-code"
-            pattern="\d{6}"
             maxLength={6}
             placeholder="6-digit verification code"
             required

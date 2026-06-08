@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { GOOGLE_REGISTER_COOKIE, VERIFIED_PIN_COOKIE } from "@/lib/constants";
@@ -152,7 +153,8 @@ export async function verifyGoogleEmailCodeAction(
   _prevState: GoogleVerifyFormState,
   formData: FormData
 ): Promise<GoogleVerifyFormState> {
-  const code = formData.get("verificationCode")?.toString().trim() ?? "";
+  const rawCode = formData.get("verificationCode")?.toString() ?? "";
+  const code = rawCode.replace(/\D/g, "");
   const session = await readGoogleRegisterSession();
 
   if (!session) {
@@ -176,6 +178,7 @@ export async function verifyGoogleEmailCodeAction(
   }
 
   await markGoogleRegisterSessionVerified(session);
+  revalidatePath("/auth/register");
   return {
     success: "Google email verified. You can now create your student account.",
   };
@@ -243,6 +246,7 @@ export async function registerWithGoogleAction(
   }
 
   try {
+    const cookieStore = await cookies();
     const student = await prisma.student.findUnique({
       where: { id: result.studentId },
       select: { id: true, fullname: true, email: true },

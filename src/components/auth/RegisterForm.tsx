@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { FiCheckCircle, FiMail, FiUser } from "react-icons/fi";
 import PasswordInput from "@/components/ui/PasswordInput";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
@@ -39,7 +39,13 @@ export default function RegisterForm({
 }: RegisterFormProps) {
   const router = useRouter();
   const usingGoogle = Boolean(googleProfile);
-  const googleReady = usingGoogle && googleEmailVerified;
+  const [localGoogleVerified, setLocalGoogleVerified] = useState(googleEmailVerified);
+  const googleReady = usingGoogle && (googleEmailVerified || localGoogleVerified);
+
+  useEffect(() => {
+    setLocalGoogleVerified(googleEmailVerified);
+  }, [googleEmailVerified]);
+
   const [state, formAction, pending] = useActionState(
     usingGoogle ? registerWithGoogleAction : registerStudentAction,
     initialState
@@ -52,12 +58,15 @@ export default function RegisterForm({
 
   const errorMessage = state?.error ?? initialError;
 
+  function handleGoogleVerified() {
+    setLocalGoogleVerified(true);
+    router.refresh();
+  }
+
   return (
     <AuthScreen>
-      <form action={formAction} className="px-6 py-4 sm:px-8">
-        <h1 className="text-lg font-bold text-[var(--primary-blue)]">
-          Create Account
-        </h1>
+      <div className="px-6 py-4 sm:px-8">
+        <h1 className="text-lg font-bold text-[var(--primary-blue)]">Create Account</h1>
         <p className="mt-1 text-sm text-zinc-600">
           {googleReady
             ? "Your Google email is verified. Review your details below, then create your account."
@@ -76,10 +85,10 @@ export default function RegisterForm({
           </div>
         ) : null}
 
-        {usingGoogle && !googleEmailVerified && googleProfile ? (
+        {usingGoogle && !googleReady && googleProfile ? (
           <GoogleEmailVerificationForm
             email={googleProfile.email}
-            onVerified={() => router.refresh()}
+            onVerified={handleGoogleVerified}
           />
         ) : null}
 
@@ -106,100 +115,103 @@ export default function RegisterForm({
           </div>
         ) : null}
 
-        <div className="relative mt-3">
-          <FiUser
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
-            size={16}
-            aria-hidden
-          />
-          <input
-            type="text"
-            name="fullname"
-            placeholder="Full name"
-            autoComplete="name"
-            required
-            readOnly={usingGoogle}
-            defaultValue={googleProfile?.fullname ?? ""}
-            className={usingGoogle ? readOnlyInputClass : inputClass}
-          />
-        </div>
-
-        <div className="relative mt-3">
-          <FiMail
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
-            size={16}
-            aria-hidden
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email address"
-            autoComplete="email"
-            required
-            readOnly={usingGoogle}
-            defaultValue={googleProfile?.email ?? ""}
-            className={usingGoogle ? readOnlyInputClass : inputClass}
-          />
-        </div>
-
-        {!usingGoogle ? (
-          <>
-            <PasswordInput
-              wrapperClassName="mt-3"
-              name="password"
-              placeholder="Password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              iconSize={16}
-              inputClassName={inputClass}
+        <form action={formAction} className="mt-3">
+          <div className="relative">
+            <FiUser
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+              size={16}
+              aria-hidden
             />
-
-            <PasswordInput
-              wrapperClassName="mt-3"
-              name="confirmPassword"
-              placeholder="Confirm password"
-              autoComplete="new-password"
-              minLength={8}
+            <input
+              type="text"
+              name="fullname"
+              placeholder="Full name"
+              autoComplete="name"
               required
-              iconSize={16}
-              inputClassName={inputClass}
+              readOnly={usingGoogle}
+              defaultValue={googleProfile?.fullname ?? ""}
+              className={usingGoogle ? readOnlyInputClass : inputClass}
             />
-          </>
-        ) : null}
+          </div>
 
-        {errorMessage ? (
-          <p className="mt-2 text-sm font-medium text-red-600" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
+          <div className="relative mt-3">
+            <FiMail
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+              size={16}
+              aria-hidden
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email address"
+              autoComplete="email"
+              required
+              readOnly={usingGoogle}
+              defaultValue={googleProfile?.email ?? ""}
+              className={usingGoogle ? readOnlyInputClass : inputClass}
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={pending || (usingGoogle && !googleEmailVerified)}
-          className="mt-3 w-full rounded-lg bg-[var(--hero-blue)] py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {pending
-            ? "Creating account…"
-            : usingGoogle
-              ? "Create Account with Google"
-              : "Create Account & Continue"}
-        </button>
+          {!usingGoogle ? (
+            <>
+              <PasswordInput
+                wrapperClassName="mt-3"
+                name="password"
+                placeholder="Password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                iconSize={16}
+                inputClassName={inputClass}
+              />
 
-        {usingGoogle && !googleEmailVerified ? (
-          <p className="mt-2 text-center text-xs text-zinc-500">
-            Verify your Google email above before creating your account.
-          </p>
-        ) : null}
+              <PasswordInput
+                wrapperClassName="mt-3"
+                name="confirmPassword"
+                placeholder="Confirm password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                iconSize={16}
+                inputClassName={inputClass}
+              />
+            </>
+          ) : null}
 
-        {usingGoogle ? (
+          {errorMessage ? (
+            <p className="mt-2 text-sm font-medium text-red-600" role="alert">
+              {errorMessage}
+            </p>
+          ) : null}
+
           <button
             type="submit"
-            formAction={clearGoogleRegisterAction}
-            className="mt-2 w-full rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:text-[var(--primary-blue)]"
+            disabled={pending || (usingGoogle && !googleReady)}
+            className="mt-3 w-full rounded-lg bg-[var(--hero-blue)] py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Register manually instead
+            {pending
+              ? "Creating account…"
+              : usingGoogle
+                ? "Create Account with Google"
+                : "Create Account & Continue"}
           </button>
+
+          {usingGoogle && !googleReady ? (
+            <p className="mt-2 text-center text-xs text-zinc-500">
+              Verify your Google email above before creating your account.
+            </p>
+          ) : null}
+        </form>
+
+        {usingGoogle ? (
+          <form action={clearGoogleRegisterAction} className="mt-2">
+            <button
+              type="submit"
+              className="w-full rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:text-[var(--primary-blue)]"
+            >
+              Register manually instead
+            </button>
+          </form>
         ) : null}
 
         <p className="mt-3 text-center text-sm text-zinc-600">
@@ -211,7 +223,7 @@ export default function RegisterForm({
             Login
           </Link>
         </p>
-      </form>
+      </div>
     </AuthScreen>
   );
 }
