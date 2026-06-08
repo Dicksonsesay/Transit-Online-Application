@@ -281,24 +281,23 @@ export default function PinManagement({ pins, stats, revenue }: PinManagementPro
               {showForm ? "Hide amount" : "Custom amount"}
             </AdminSecondaryButton>
           </div>
-        </div>
 
-        {showForm ? (
-          <div className="border-t border-slate-100 bg-gradient-to-r from-amber-50/50 to-white px-5 py-4 sm:px-6">
-            <label htmlFor="amount" className="mb-1.5 block text-sm font-semibold text-zinc-700">
-              Amount (SLE)
-            </label>
-            <input
-              id="amount"
-              name="amount"
-              type="number"
-              min="0.01"
-              step="0.01"
-              defaultValue={DEFAULT_ADMISSION_PIN_AMOUNT}
-              className="max-w-xs rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
-            />
-          </div>
-        ) : null}
+          {showForm ? (
+            <div className="border-t border-slate-100 bg-gradient-to-r from-amber-50/50 to-white px-5 py-4 sm:px-6">
+              <label htmlFor="amount" className="mb-1.5 block text-sm font-semibold text-zinc-700">
+                Amount (SLE)
+              </label>
+              <input
+                id="amount"
+                name="amount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                defaultValue={DEFAULT_ADMISSION_PIN_AMOUNT}
+                className="max-w-xs rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--primary-blue)] focus:ring-2 focus:ring-[var(--primary-blue)]/15"
+              />
+            </div>
+          ) : null}
 
           {generateState.error ? (
             <p className="border-t border-slate-100 px-5 py-3 text-sm font-medium text-red-600" role="alert">
