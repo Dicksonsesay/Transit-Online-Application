@@ -44,9 +44,15 @@ export function AdminTableShell({
   );
 }
 
-export function AdminTable({ children }: { children: ReactNode }) {
+export function AdminTable({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <table className="min-w-full text-left text-sm">
+    <table className={cn("min-w-full text-left text-sm", className)}>
       {children}
     </table>
   );
