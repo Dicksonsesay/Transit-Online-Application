@@ -27,11 +27,13 @@ const navIcons: Record<string, IconType> = {
 type StudentSidebarProps = {
   mobileOpen?: boolean;
   onNavigate?: () => void;
+  hasPassword?: boolean;
 };
 
 export default function StudentSidebar({
   mobileOpen = false,
   onNavigate,
+  hasPassword = true,
 }: StudentSidebarProps) {
   const pathname = usePathname();
 
@@ -80,7 +82,11 @@ export default function StudentSidebar({
               )}
             >
               <Icon size={18} className="shrink-0" aria-hidden />
-              <span className="flex-1">{item.label}</span>
+              <span className="flex-1">
+                {item.href === "/student/change-password" && !hasPassword
+                  ? "Set Password"
+                  : item.label}
+              </span>
             </Link>
           );
         })}

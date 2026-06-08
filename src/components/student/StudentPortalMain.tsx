@@ -20,6 +20,7 @@ type StudentPortalMainProps = {
   studentName: string;
   notifications: NotificationBellItem[];
   unreadCount: number;
+  hasPassword?: boolean;
   onMenuClick?: () => void;
 };
 
@@ -28,10 +29,14 @@ export default function StudentPortalMain({
   studentName,
   notifications,
   unreadCount,
+  hasPassword = true,
   onMenuClick,
 }: StudentPortalMainProps) {
   const pathname = usePathname();
-  const title = pageTitles[pathname] ?? "Student Portal";
+  const title =
+    pathname === "/student/change-password" && !hasPassword
+      ? "Set Password"
+      : (pageTitles[pathname] ?? "Student Portal");
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#f8f9fa]">
@@ -40,6 +45,7 @@ export default function StudentPortalMain({
         studentName={studentName}
         notifications={notifications}
         unreadCount={unreadCount}
+        hasPassword={hasPassword}
         onMenuClick={onMenuClick}
       />
       <div className="min-h-0 flex-1 overflow-auto">{children}</div>

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import StudentProfilePanel from "@/components/account/StudentProfilePanel";
 import { prisma } from "@/lib/prisma";
+import { getStudentPasswordStatus } from "@/lib/student-account";
 import { requireStudentSession } from "@/lib/session";
 
 export const metadata = {
@@ -36,21 +37,24 @@ export default async function ProfilePage() {
     redirect("/auth/login");
   }
 
-  const student = await prisma.student.findUnique({
-    where: { id: studentId },
-    select: {
-      applicationNumber: true,
-      fullname: true,
-      gender: true,
-      dateOfBirth: true,
-      email: true,
-      phone: true,
-      address: true,
-      nationality: true,
-      accountStatus: true,
-      createdAt: true,
-    },
-  });
+  const [student, { hasPassword }] = await Promise.all([
+    prisma.student.findUnique({
+      where: { id: studentId },
+      select: {
+        applicationNumber: true,
+        fullname: true,
+        gender: true,
+        dateOfBirth: true,
+        email: true,
+        phone: true,
+        address: true,
+        nationality: true,
+        accountStatus: true,
+        createdAt: true,
+      },
+    }),
+    getStudentPasswordStatus(studentId),
+  ]);
 
   if (!student) {
     redirect("/auth/login");
@@ -68,6 +72,7 @@ export default async function ProfilePage() {
 
   return (
     <StudentProfilePanel
+      hasPassword={hasPassword}
       details={{
         applicationNumber: displayValue(student.applicationNumber),
         fullname: student.fullname,

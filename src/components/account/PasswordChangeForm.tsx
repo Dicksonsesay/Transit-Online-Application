@@ -14,6 +14,7 @@ type PasswordChangeFormProps = {
   action: PasswordAction;
   id?: string;
   submitLabel?: string;
+  hasPassword?: boolean;
 };
 
 const initialState: PasswordChangeState = {};
@@ -21,8 +22,12 @@ const initialState: PasswordChangeState = {};
 export default function PasswordChangeForm({
   action,
   id = "change-password",
-  submitLabel = "Update password",
+  submitLabel,
+  hasPassword = true,
 }: PasswordChangeFormProps) {
+  const isSetMode = !hasPassword;
+  const resolvedSubmitLabel =
+    submitLabel ?? (isSetMode ? "Set password" : "Update password");
   const [state, formAction, pending] = useActionState(action, initialState);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -49,32 +54,36 @@ export default function PasswordChangeForm({
           </span>
           <div>
             <h2 className="text-lg font-bold text-[var(--primary-blue)]">
-              Change password
+              {isSetMode ? "Set a password" : "Change password"}
             </h2>
             <p className="mt-0.5 text-sm text-zinc-500">
-              Enter your current password before choosing a new one.
+              {isSetMode
+                ? "Your account uses Google sign-in. Add a password if you also want to sign in with your email."
+                : "Enter your current password before choosing a new one."}
             </p>
           </div>
         </div>
       </div>
 
       <div className="space-y-4 p-5 sm:p-6">
-        <div>
-          <label
-            htmlFor="currentPassword"
-            className="mb-1.5 block text-sm font-medium text-zinc-700"
-          >
-            Current password
-          </label>
-          <PasswordInput
-            id="currentPassword"
-            name="currentPassword"
-            autoComplete="current-password"
-            required
-            iconSize={16}
-            inputClassName={inputClass}
-          />
-        </div>
+        {hasPassword ? (
+          <div>
+            <label
+              htmlFor="currentPassword"
+              className="mb-1.5 block text-sm font-medium text-zinc-700"
+            >
+              Current password
+            </label>
+            <PasswordInput
+              id="currentPassword"
+              name="currentPassword"
+              autoComplete="current-password"
+              required
+              iconSize={16}
+              inputClassName={inputClass}
+            />
+          </div>
+        ) : null}
 
         <div>
           <label
@@ -128,7 +137,7 @@ export default function PasswordChangeForm({
             role="status"
           >
             <FiCheckCircle size={16} aria-hidden />
-            Password updated successfully.
+            {isSetMode ? "Password set successfully." : "Password updated successfully."}
           </p>
         ) : null}
       </div>
@@ -139,7 +148,7 @@ export default function PasswordChangeForm({
           disabled={pending}
           className="inline-flex min-h-10 items-center justify-center rounded-xl bg-[var(--hero-blue)] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {pending ? "Updating..." : submitLabel}
+          {pending ? "Saving..." : resolvedSubmitLabel}
         </button>
       </div>
     </form>

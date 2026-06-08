@@ -3,10 +3,12 @@ import { FiChevronRight, FiLock, FiShield } from "react-icons/fi";
 
 type ProfileSecurityCardProps = {
   changePasswordHref: string;
+  hasPassword?: boolean;
 };
 
 export default function ProfileSecurityCard({
   changePasswordHref,
+  hasPassword = true,
 }: ProfileSecurityCardProps) {
   return (
     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -17,7 +19,9 @@ export default function ProfileSecurityCard({
         <div>
           <h2 className="text-base font-bold text-[var(--primary-blue)]">Security</h2>
           <p className="mt-1 text-sm text-zinc-500">
-            Keep your account secure with a strong, unique password.
+            {hasPassword
+              ? "Keep your account secure with a strong, unique password."
+              : "You signed in with Google. Add a password if you also want to sign in with your email."}
           </p>
         </div>
       </div>
@@ -30,7 +34,7 @@ export default function ProfileSecurityCard({
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[var(--primary-blue)] shadow-sm">
             <FiLock size={15} aria-hidden />
           </span>
-          Change password
+          {hasPassword ? "Change password" : "Set a password"}
         </span>
         <FiChevronRight size={18} className="shrink-0 text-zinc-400" aria-hidden />
       </Link>

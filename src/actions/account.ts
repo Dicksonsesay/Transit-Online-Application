@@ -72,12 +72,11 @@ function readPasswordFields(formData: FormData) {
   };
 }
 
-function validatePasswordFields({
-  currentPassword,
-  newPassword,
-  confirmPassword,
-}: ReturnType<typeof readPasswordFields>) {
-  if (!currentPassword || !newPassword || !confirmPassword) {
+function validateNewPasswordFields(
+  newPassword: string,
+  confirmPassword: string
+) {
+  if (!newPassword || !confirmPassword) {
     return "Complete all password fields.";
   }
 
@@ -87,6 +86,23 @@ function validatePasswordFields({
 
   if (newPassword !== confirmPassword) {
     return "New passwords do not match.";
+  }
+
+  return null;
+}
+
+function validatePasswordFields({
+  currentPassword,
+  newPassword,
+  confirmPassword,
+}: ReturnType<typeof readPasswordFields>) {
+  if (!currentPassword) {
+    return "Enter your current password.";
+  }
+
+  const newPasswordError = validateNewPasswordFields(newPassword, confirmPassword);
+  if (newPasswordError) {
+    return newPasswordError;
   }
 
   if (currentPassword === newPassword) {
@@ -111,10 +127,6 @@ export async function changeStudentPasswordAction(
   }
 
   const fields = readPasswordFields(formData);
-  const validationError = validatePasswordFields(fields);
-  if (validationError) {
-    return { error: validationError };
-  }
 
   const student = await prisma.student.findUnique({
     where: { id: studentId },
@@ -126,20 +138,23 @@ export async function changeStudentPasswordAction(
   }
 
   const passwordHash = student.password;
-  if (!passwordHash) {
-    return {
-      error:
-        "Your account uses Google sign-in and does not have a password to change.",
-    };
+  const validationError = passwordHash
+    ? validatePasswordFields(fields)
+    : validateNewPasswordFields(fields.newPassword, fields.confirmPassword);
+
+  if (validationError) {
+    return { error: validationError };
   }
 
-  const currentPasswordIsValid = await bcrypt.compare(
-    fields.currentPassword,
-    passwordHash
-  );
+  if (passwordHash) {
+    const currentPasswordIsValid = await bcrypt.compare(
+      fields.currentPassword,
+      passwordHash
+    );
 
-  if (!currentPasswordIsValid) {
-    return { error: "Current password is incorrect." };
+    if (!currentPasswordIsValid) {
+      return { error: "Current password is incorrect." };
+    }
   }
 
   const hashedPassword = await bcrypt.hash(fields.newPassword, 12);
@@ -150,6 +165,8 @@ export async function changeStudentPasswordAction(
   });
 
   revalidatePath("/student/change-password");
+  revalidatePath("/student/profile");
+  revalidatePath("/student");
   return { success: true };
 }
 

@@ -13,6 +13,7 @@ type StudentTopBarProps = {
   studentName: string;
   notifications: NotificationBellItem[];
   unreadCount: number;
+  hasPassword?: boolean;
   onMenuClick?: () => void;
 };
 
@@ -21,6 +22,7 @@ export default function StudentTopBar({
   studentName,
   notifications,
   unreadCount,
+  hasPassword = true,
   onMenuClick,
 }: StudentTopBarProps) {
   const [open, setOpen] = useState(false);
@@ -101,7 +103,7 @@ export default function StudentTopBar({
                   onClick={() => setOpen(false)}
                 >
                   <FiLock size={16} aria-hidden />
-                  Change password
+                  {hasPassword ? "Change password" : "Set a password"}
                 </Link>
                 <button
                   type="button"

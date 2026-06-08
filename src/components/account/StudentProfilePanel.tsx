@@ -18,6 +18,7 @@ import ProfileSecurityCard from "@/components/account/ProfileSecurityCard";
 import { formatProfileLabel } from "@/lib/profile-display";
 
 type StudentProfilePanelProps = {
+  hasPassword?: boolean;
   details: {
     applicationNumber: string;
     fullname: string;
@@ -42,6 +43,7 @@ type StudentProfilePanelProps = {
 };
 
 export default function StudentProfilePanel({
+  hasPassword = true,
   details,
   formStudent,
 }: StudentProfilePanelProps) {
@@ -154,7 +156,10 @@ export default function StudentProfilePanel({
             ]}
             memberSince={details.joined}
           />
-          <ProfileSecurityCard changePasswordHref="/student/change-password" />
+          <ProfileSecurityCard
+            changePasswordHref="/student/change-password"
+            hasPassword={hasPassword}
+          />
         </div>
       </div>
     </div>

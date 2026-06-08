@@ -9,6 +9,7 @@ type StudentShellProps = {
   studentName: string;
   unreadMessages: number;
   notifications: NotificationBellItem[];
+  hasPassword?: boolean;
   children: ReactNode;
 };
 
@@ -16,6 +17,7 @@ export default function StudentShell({
   studentName,
   unreadMessages,
   notifications,
+  hasPassword = true,
   children,
 }: StudentShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -34,12 +36,14 @@ export default function StudentShell({
       <StudentSidebar
         mobileOpen={sidebarOpen}
         onNavigate={() => setSidebarOpen(false)}
+        hasPassword={hasPassword}
       />
 
       <StudentPortalMain
         studentName={studentName}
         notifications={notifications}
         unreadCount={unreadMessages}
+        hasPassword={hasPassword}
         onMenuClick={() => setSidebarOpen(true)}
       >
         {children}
