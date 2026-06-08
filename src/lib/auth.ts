@@ -5,12 +5,18 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { findStudentByPin } from "@/lib/student-auth";
 import { getGoogleOAuthConfig } from "@/lib/google-oauth-config";
+import {
+  SESSION_MAX_AGE,
+  getSessionLastActivity,
+  isSessionIdleExpired,
+  resolveSessionLastActivity,
+} from "@/lib/session-config";
 
 const googleOAuth = getGoogleOAuthConfig();
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: SESSION_MAX_AGE },
   pages: {
     signIn: "/auth/login",
     error: "/auth/login",
@@ -90,7 +96,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account, profile, trigger }) {
       if (account?.provider === "google" && user) {
         token.id = account.providerAccountId;
         token.email = user.email;
@@ -101,9 +107,39 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as { role?: string }).role;
         token.id = user.id;
       }
+
+      if (user || trigger === "update") {
+        token.lastActivity = getSessionLastActivity();
+      }
+
+      if (
+        isSessionIdleExpired(
+          resolveSessionLastActivity(token),
+          token.role as string | undefined
+        )
+      ) {
+        token.expired = true;
+      }
+
       return token;
     },
     async session({ session, token }) {
+      if (
+        token.expired ||
+        isSessionIdleExpired(
+          resolveSessionLastActivity(token),
+          token.role as string | undefined
+        )
+      ) {
+        session.expires = new Date(0).toISOString();
+        session.user = {
+          id: "",
+          email: null,
+          name: null,
+        };
+        return session;
+      }
+
       if (session.user) {
         session.user.id = token.id as string;
         (session.user as { role?: string }).role = token.role as string;

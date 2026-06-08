@@ -9,11 +9,17 @@ import { FiMail } from "react-icons/fi";
 import PasswordInput from "@/components/ui/PasswordInput";
 import AuthScreen from "@/components/auth/AuthScreen";
 
-export default function AdminLoginForm() {
+type AdminLoginFormProps = {
+  initialError?: string;
+};
+
+export default function AdminLoginForm({
+  initialError,
+}: AdminLoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError ?? "");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {

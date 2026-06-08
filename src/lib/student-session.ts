@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
-import { encode } from "next-auth/jwt";
-
-const SESSION_MAX_AGE = 30 * 24 * 60 * 60;
+import { SESSION_MAX_AGE } from "@/lib/session-config";
+import { encodeAuthSessionToken } from "@/lib/session-token";
 
 export function getSessionCookieName() {
   return process.env.NODE_ENV === "production"
@@ -25,21 +24,12 @@ export async function encodeStudentSessionToken(student: {
   fullname: string;
   email: string;
 }) {
-  const secret = process.env.NEXTAUTH_SECRET;
-  if (!secret) {
-    throw new Error("NEXTAUTH_SECRET is not set");
-  }
-
-  return encode({
-    token: {
-      sub: String(student.id),
-      id: String(student.id),
-      role: "student",
-      name: student.fullname,
-      email: student.email,
-    },
-    secret,
-    maxAge: SESSION_MAX_AGE,
+  return encodeAuthSessionToken({
+    sub: String(student.id),
+    id: String(student.id),
+    role: "student",
+    name: student.fullname,
+    email: student.email,
   });
 }
 

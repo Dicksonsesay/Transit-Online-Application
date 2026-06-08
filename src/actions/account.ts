@@ -3,8 +3,9 @@
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { encode } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
+import { SESSION_MAX_AGE } from "@/lib/session-config";
+import { encodeAuthSessionToken } from "@/lib/session-token";
 import { requireAdminSession, requireStudentSession } from "@/lib/session";
 import { getSessionCookieName, setStudentSessionCookie } from "@/lib/student-session";
 
@@ -18,7 +19,6 @@ export type ProfileUpdateState = {
   success?: boolean;
 };
 
-const SESSION_MAX_AGE = 30 * 24 * 60 * 60;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function parseSessionId(id: string | undefined) {
@@ -37,21 +37,12 @@ async function setAdminSessionCookie(admin: {
   email: string;
   role: string;
 }) {
-  const secret = process.env.NEXTAUTH_SECRET;
-  if (!secret) {
-    throw new Error("NEXTAUTH_SECRET is not set");
-  }
-
-  const token = await encode({
-    token: {
-      sub: String(admin.id),
-      id: String(admin.id),
-      role: admin.role,
-      name: admin.fullname,
-      email: admin.email,
-    },
-    secret,
-    maxAge: SESSION_MAX_AGE,
+  const token = await encodeAuthSessionToken({
+    sub: String(admin.id),
+    id: String(admin.id),
+    role: admin.role,
+    name: admin.fullname,
+    email: admin.email,
   });
 
   const cookieStore = await cookies();
