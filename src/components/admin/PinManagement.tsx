@@ -349,7 +349,7 @@ export default function PinManagement({ pins, stats, revenue }: PinManagementPro
               />
             ) : (
               filteredPins.map((pin) => (
-                <AdminTableRow key={pin.id}>
+                <AdminTableRow key={pin.id} striped>
                   <AdminTd>
                     <span className="inline-flex items-center rounded-lg bg-[var(--primary-blue)]/10 px-2.5 py-1.5 font-mono text-sm font-bold tracking-wider text-[var(--primary-blue)]">
                       {pin.pinCode}

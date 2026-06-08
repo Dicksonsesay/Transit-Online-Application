@@ -349,7 +349,7 @@ export default function InterviewManagement({
               />
             ) : (
               filtered.map((item) => (
-                <AdminTableRow key={item.id}>
+                <AdminTableRow key={item.id} striped>
                   <AdminTd>
                     <div className="flex items-center gap-3">
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--primary-blue)] to-[var(--hero-blue)] text-xs font-bold text-white">

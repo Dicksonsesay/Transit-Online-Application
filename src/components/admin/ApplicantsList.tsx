@@ -23,10 +23,11 @@ import {
 } from "@/components/admin/ui/AdminTable";
 import ApplicantDecisionActions from "@/components/admin/ApplicantDecisionActions";
 import AdminExportToolbar from "@/components/admin/AdminExportToolbar";
+import AdminStatusBadge from "@/components/admin/ui/AdminStatusBadge";
 import { applicationStatusLabel } from "@/lib/application-status";
 import type { ApplicantListItem } from "@/lib/admin-applicants";
 import type { ApplicationStatus } from "@/generated/prisma/client";
-import { cn, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 type ApplicantsListProps = {
   applicants: ApplicantListItem[];
@@ -42,15 +43,6 @@ type ApplicantsListProps = {
 };
 
 type StatusFilter = "all" | ApplicationStatus;
-
-const statusBadgeClass: Record<ApplicationStatus, string> = {
-  submitted: "bg-blue-100 text-blue-800 ring-1 ring-blue-200/60",
-  under_review: "bg-amber-100 text-amber-800 ring-1 ring-amber-200/60",
-  interview_scheduled: "bg-purple-100 text-purple-800 ring-1 ring-purple-200/60",
-  interviewed: "bg-indigo-100 text-indigo-800 ring-1 ring-indigo-200/60",
-  accepted: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200/60",
-  rejected: "bg-red-100 text-red-800 ring-1 ring-red-200/60",
-};
 
 export default function ApplicantsList({ applicants, stats }: ApplicantsListProps) {
   const [query, setQuery] = useState("");
@@ -198,7 +190,7 @@ export default function ApplicantsList({ applicants, stats }: ApplicantsListProp
               />
             ) : (
               filtered.map((applicant) => (
-                <AdminTableRow key={applicant.studentId}>
+                <AdminTableRow key={applicant.studentId} striped>
                   <AdminTd>
                     <div className="flex items-center gap-3">
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--primary-yellow)] to-amber-500 text-xs font-bold text-[var(--dark-blue)]">
@@ -233,14 +225,7 @@ export default function ApplicantsList({ applicants, stats }: ApplicantsListProp
                     </p>
                   </AdminTd>
                   <AdminTd>
-                    <span
-                      className={cn(
-                        "inline-flex rounded-full px-2.5 py-1 text-xs font-bold",
-                        statusBadgeClass[applicant.applicationStatus]
-                      )}
-                    >
-                      {applicationStatusLabel[applicant.applicationStatus]}
-                    </span>
+                    <AdminStatusBadge status={applicant.applicationStatus} />
                   </AdminTd>
                   <AdminTd>
                     <span className="text-sm text-zinc-600">

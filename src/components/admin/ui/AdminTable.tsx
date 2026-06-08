@@ -20,20 +20,20 @@ export function AdminTableShell({
   return (
     <section
       className={cn(
-        "overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm ring-1 ring-slate-900/5",
+        "overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm ring-1 ring-slate-900/[0.04]",
         className
       )}
     >
       {title ? (
-        <div className="flex flex-col gap-1 border-b border-slate-100 bg-gradient-to-r from-slate-50 via-white to-slate-50/80 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-1 border-b border-slate-100 bg-gradient-to-r from-slate-50 via-white to-blue-50/30 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-sm font-bold text-[var(--primary-blue)]">{title}</h3>
             {subtitle ? (
-              <p className="mt-0.5 text-xs text-zinc-500">{subtitle}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-zinc-500">{subtitle}</p>
             ) : null}
           </div>
           {countLabel ? (
-            <span className="inline-flex w-fit rounded-full bg-[var(--primary-blue)]/10 px-3 py-1 text-xs font-semibold text-[var(--primary-blue)]">
+            <span className="inline-flex w-fit rounded-full bg-[var(--primary-blue)]/10 px-3 py-1 text-xs font-semibold text-[var(--primary-blue)] ring-1 ring-[var(--primary-blue)]/10">
               {countLabel}
             </span>
           ) : null}
@@ -55,7 +55,7 @@ export function AdminTable({ children }: { children: ReactNode }) {
 export function AdminTableHead({ children }: { children: ReactNode }) {
   return (
     <thead>
-      <tr className="border-b border-slate-200 bg-slate-50/90 text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-500">
+      <tr className="border-b border-slate-200 bg-gradient-to-r from-slate-100/90 via-slate-50 to-blue-50/40 text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-500">
         {children}
       </tr>
     </thead>
@@ -63,7 +63,7 @@ export function AdminTableHead({ children }: { children: ReactNode }) {
 }
 
 export function AdminTableBody({ children }: { children: ReactNode }) {
-  return <tbody className="divide-y divide-slate-100">{children}</tbody>;
+  return <tbody className="divide-y divide-slate-100/90">{children}</tbody>;
 }
 
 export function AdminTh({
@@ -97,14 +97,17 @@ export function AdminTd({
 export function AdminTableRow({
   children,
   className,
+  striped,
 }: {
   children: ReactNode;
   className?: string;
+  striped?: boolean;
 }) {
   return (
     <tr
       className={cn(
-        "transition-colors hover:bg-gradient-to-r hover:from-blue-50/40 hover:to-transparent",
+        "transition-colors hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent",
+        striped && "even:bg-slate-50/40",
         className
       )}
     >

@@ -71,7 +71,7 @@ export default function AdminCharts({ report, compact = false }: AdminChartsProp
           : "grid gap-6 lg:grid-cols-2 xl:grid-cols-3"
       }
     >
-      <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:col-span-1">
+      <article className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm ring-1 ring-slate-900/[0.04] lg:col-span-1">
         <h3 className="text-sm font-bold text-[var(--primary-blue)]">
           Applications by status
         </h3>
@@ -100,7 +100,7 @@ export default function AdminCharts({ report, compact = false }: AdminChartsProp
         </div>
       </article>
 
-      <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:col-span-1">
+      <article className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm ring-1 ring-slate-900/[0.04] lg:col-span-1">
         <h3 className="text-sm font-bold text-[var(--primary-blue)]">
           Monthly submissions
         </h3>

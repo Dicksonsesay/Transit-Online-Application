@@ -20,6 +20,14 @@ export const pdfBaseStyles = StyleSheet.create({
     fontFamily: "Helvetica",
     color: PDF_COLORS.text,
   },
+  receiptPage: {
+    paddingTop: 22,
+    paddingBottom: 28,
+    paddingHorizontal: 28,
+    fontSize: 9,
+    fontFamily: "Helvetica",
+    color: PDF_COLORS.text,
+  },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -44,8 +52,18 @@ export const pdfBaseStyles = StyleSheet.create({
     height: 52,
     objectFit: "contain",
   },
+  logoCompact: {
+    width: 36,
+    height: 36,
+    objectFit: "contain",
+  },
   collegeName: {
     fontSize: 16,
+    fontWeight: "bold",
+    color: PDF_COLORS.primary,
+  },
+  collegeNameCompact: {
+    fontSize: 12,
     fontWeight: "bold",
     color: PDF_COLORS.primary,
   },
@@ -56,6 +74,12 @@ export const pdfBaseStyles = StyleSheet.create({
   },
   docTitle: {
     fontSize: 13,
+    fontWeight: "bold",
+    color: PDF_COLORS.primary,
+    textAlign: "right",
+  },
+  docTitleCompact: {
+    fontSize: 10,
     fontWeight: "bold",
     color: PDF_COLORS.primary,
     textAlign: "right",
@@ -129,6 +153,17 @@ export const pdfBaseStyles = StyleSheet.create({
   footerText: {
     fontSize: 7,
     color: PDF_COLORS.muted,
+  },
+  receiptFooter: {
+    position: "absolute",
+    bottom: 16,
+    left: 28,
+    right: 28,
+    borderTopWidth: 1,
+    borderTopColor: PDF_COLORS.border,
+    paddingTop: 6,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
 

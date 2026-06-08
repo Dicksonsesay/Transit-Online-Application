@@ -11,13 +11,5 @@ export default async function ApplicantsPage() {
     getApplicantStats(),
   ]);
 
-  return (
-    <div>
-      <p className="mb-6 text-zinc-600">
-        Review submitted applications and open any applicant to see their full
-        details.
-      </p>
-      <ApplicantsList applicants={applicants} stats={stats} />
-    </div>
-  );
+  return <ApplicantsList applicants={applicants} stats={stats} />;
 }

@@ -7,6 +7,7 @@ type PdfDocumentHeaderProps = {
   logoSrc?: string;
   title: string;
   subtitle?: string;
+  compact?: boolean;
 };
 
 export default function PdfDocumentHeader({
@@ -15,21 +16,36 @@ export default function PdfDocumentHeader({
   logoSrc,
   title,
   subtitle,
+  compact = false,
 }: PdfDocumentHeaderProps) {
   return (
-    <View style={pdfBaseStyles.headerRow}>
+    <View
+      style={
+        compact
+          ? { ...pdfBaseStyles.headerRow, marginBottom: 8, paddingBottom: 8 }
+          : pdfBaseStyles.headerRow
+      }
+    >
       <View style={pdfBaseStyles.headerLeft}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-          {logoSrc ? <Image src={logoSrc} style={pdfBaseStyles.logo} /> : null}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: compact ? 6 : 10 }}>
+          {logoSrc ? (
+            <Image src={logoSrc} style={compact ? pdfBaseStyles.logoCompact : pdfBaseStyles.logo} />
+          ) : null}
           <View style={{ flex: 1 }}>
-            <Text style={pdfBaseStyles.collegeName}>{collegeName}</Text>
+            <Text style={compact ? pdfBaseStyles.collegeNameCompact : pdfBaseStyles.collegeName}>
+              {collegeName}
+            </Text>
             <Text style={pdfBaseStyles.collegeTagline}>{tagline}</Text>
           </View>
         </View>
       </View>
       <View style={pdfBaseStyles.headerRight}>
-        <Text style={pdfBaseStyles.docTitle}>{title}</Text>
-        {subtitle ? <Text style={pdfBaseStyles.docMeta}>{subtitle}</Text> : null}
+        <Text style={compact ? pdfBaseStyles.docTitleCompact : pdfBaseStyles.docTitle}>
+          {title}
+        </Text>
+        {subtitle ? (
+          <Text style={pdfBaseStyles.docMeta}>{subtitle}</Text>
+        ) : null}
       </View>
     </View>
   );

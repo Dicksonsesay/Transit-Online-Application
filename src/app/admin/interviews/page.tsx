@@ -14,15 +14,10 @@ export default async function InterviewsPage() {
   ]);
 
   return (
-    <div>
-      <p className="mb-6 text-zinc-600">
-        Schedule interviews for applicants and update outcomes after each session.
-      </p>
-      <InterviewManagement
-        interviews={interviews}
-        applicants={applicants}
-        defaultInterviewVenue={defaultInterviewVenue}
-      />
-    </div>
+    <InterviewManagement
+      interviews={interviews}
+      applicants={applicants}
+      defaultInterviewVenue={defaultInterviewVenue}
+    />
   );
 }
